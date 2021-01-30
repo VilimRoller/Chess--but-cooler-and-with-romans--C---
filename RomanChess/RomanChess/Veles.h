@@ -12,7 +12,8 @@ public:
 	~Veles();
 
 	std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) override;
-	
+
+
 	//Illegal moves for this figure
 	const BoardCoordinates MoveBack(const int number_of_spaces = 1) const = delete;
 	const BoardCoordinates MoveLeftSide(const int number_of_spaces = 1) const = delete;

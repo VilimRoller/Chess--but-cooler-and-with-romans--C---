@@ -11,9 +11,12 @@ public:
     
     ~Hastatus();
 
+
     std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) override;
 
     void CheckFront(const BoardImage& board_layout, std::vector<BoardCoordinates>& res);
+
+    
 
     void AddKill() {
         ++number_of_kills_;

@@ -10,7 +10,6 @@ Consul::~Consul() {
 
 }
 
-
 std::vector<BoardCoordinates> Consul::GetLegalMoves(const BoardImage& board_layout) {
 	std::vector<BoardCoordinates> result;
 

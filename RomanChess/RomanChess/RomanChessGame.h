@@ -1,11 +1,13 @@
 #pragma once
 #include <memory>
-
-#include "Board.h"
-#include "FigureIncludes.h"
+#include <array>
 #include "Constants.h"
+#include "wxConstants.h"
+#include "wxID.h"
+#include "FigureIncludes.h"
+#include "BoardCanvas.h"
 
-using BoardLayout = std::array<std::array<std::shared_ptr<Figure>, Constants::boardSize>, Constants::boardSize>;
+using RomanChessFigures = std::array<std::array<std::shared_ptr<Figure>, Constants::boardSize>, Constants::boardSize>;
 
 class RomanChessGame
 {
@@ -27,13 +29,28 @@ public:
 	bool IsGameOver();
 	void EndGame();
 	void SetFigure(FigureImage figure, BoardCoordinates position);
-	void InitializeFigures(const BoardImage& board_image);
+	void InitializeRomanChessFigures(const BoardImage& board_image);
 	bool MoveFigure();
+	void LoadTextures();
+
+	void MakeNewBoardCanvas(wxWindow* ParentWindow);
+
+	void GetAllSprites();
+
+	void InitializeBoardSprite();
 
 private:
-	Board game_board_;
 	bool is_game_over_ = false;
 	figureColour player_turn_;
-	BoardLayout figures_;
+	RomanChessFigures figures_;
+	sf::Texture board_texture_;
+	sf::Texture figure_textures_;
+
+	std::vector<std::shared_ptr<sf::Sprite>> all_sprites_;
+
+	std::shared_ptr<sf::Sprite> board_sprite_;
+
+	std::shared_ptr<BoardCanvas> board_canvas_;
+	BoardImage board_image_;
 };
 

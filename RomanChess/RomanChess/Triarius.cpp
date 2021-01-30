@@ -10,6 +10,7 @@ Triarius::~Triarius(){
 
 }
 
+
 std::vector<BoardCoordinates> Triarius::GetLegalMoves(const BoardImage& board_layout){
 	std::vector<BoardCoordinates> result;
 

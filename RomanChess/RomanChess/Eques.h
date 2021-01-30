@@ -11,6 +11,7 @@ public:
 
 	~Eques();
 
+
 	std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) override;
 
 	template <class T1>

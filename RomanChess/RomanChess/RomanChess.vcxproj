@@ -23,7 +23,6 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="BoardCanvas.h" />
     <ClInclude Include="BoardCoordinates.h" />
-    <ClInclude Include="BoardLayout.h" />
     <ClInclude Include="ChessApp.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Consul.h" />
@@ -81,7 +80,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>

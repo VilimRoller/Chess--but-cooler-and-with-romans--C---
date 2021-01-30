@@ -155,7 +155,7 @@ void MainWindow::SetShowRulesMenuItem() {
 }
 
 void MainWindow::OnNew(wxCommandEvent& event) {
-    MakeNewBoard();
+    MakeNewGame();
 
 
     
@@ -204,7 +204,7 @@ void MainWindow::OnClose(wxCloseEvent& event) {
     Destroy();
 }
 
-void MainWindow::MakeNewBoard() {
-    game_board_ = std::make_shared<Board>();
-    game_board_->MakeNewBoardCanvas(this);
+void MainWindow::MakeNewGame() {
+    game_ = std::make_shared<RomanChessGame>();
+    game_->MakeNewBoardCanvas(this);
 }

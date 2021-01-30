@@ -11,6 +11,8 @@ Hastatus::~Hastatus() {
 
 }
 
+
+
 std::vector<BoardCoordinates> Hastatus::GetLegalMoves(const BoardImage& board_layout){
 	std::vector<BoardCoordinates> result;
 

@@ -11,7 +11,6 @@ Veles::~Veles() {
 std::vector<BoardCoordinates> Veles::GetLegalMoves(const BoardImage& board_layout){
 	std::vector<BoardCoordinates> result;
 	
-
 	ValidateMove(board_layout, result, MoveFront(), IsPlaceEmptyLambda);
 	ValidateMove(board_layout, result, MoveDiagonalLeftFront(), GetEnemyColourLambda());
 	ValidateMove(board_layout, result, MoveDiagonalRightFront(), GetEnemyColourLambda());

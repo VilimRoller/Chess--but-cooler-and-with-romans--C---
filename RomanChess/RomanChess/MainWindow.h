@@ -2,7 +2,7 @@
 #include "wxConstants.h"
 #include "wxID.h"
 #include "wx/artprov.h"
-#include "Board.h"
+#include "RomanChessGame.h"
 
 
 class MainWindow :
@@ -67,37 +67,37 @@ public:
 
     void OnClose(wxCloseEvent& event);
 
-    void MakeNewBoard();
+    void MakeNewGame();
 private:
 
     bool is_game_saved_ = true;
-    std::shared_ptr<Board> game_board_;
+    std::shared_ptr<RomanChessGame> game_ = nullptr;
 
     //Smart pointers are not supported by wxWidgets
     //Memory will be freed by wxWidgets framework automatically after closing window
-    wxMenuBar* menu_bar_;
+    wxMenuBar* menu_bar_ = nullptr;
 
     //Menus
-    wxMenu* file_menu_;
-    wxMenu* options_menu_;
-    wxMenu* view_menu_;
-    wxMenu* rules_menu_;
+    wxMenu* file_menu_ = nullptr;
+    wxMenu* options_menu_ = nullptr;
+    wxMenu* view_menu_ = nullptr;
+    wxMenu* rules_menu_ = nullptr;
 
     //File menu items
-    wxMenuItem* new_game_;
-    wxMenuItem* save_game_;
-    wxMenuItem* load_game_;
-    wxMenuItem* quit_app_;
+    wxMenuItem* new_game_ = nullptr;
+    wxMenuItem* save_game_ = nullptr;
+    wxMenuItem* load_game_ = nullptr;
+    wxMenuItem* quit_app_ = nullptr;
 
     
     //Options menu items
-    wxMenu* game_mode_sub_menu_;
+    wxMenu* game_mode_sub_menu_ = nullptr;
     
     //View menu items
-    wxMenuItem* display_info_;
+    wxMenuItem* display_info_ = nullptr;
 
     //Rules menu items
-    wxMenuItem* show_game_rules_;
+    wxMenuItem* show_game_rules_ = nullptr;
 
     DECLARE_EVENT_TABLE()
 }; 

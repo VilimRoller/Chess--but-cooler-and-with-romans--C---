@@ -11,6 +11,8 @@ Princeps::~Princeps() {
 
 }
 
+
+
 std::vector<BoardCoordinates> Princeps::GetLegalMoves(const BoardImage& board_layout){
 	std::vector<BoardCoordinates> result;
 

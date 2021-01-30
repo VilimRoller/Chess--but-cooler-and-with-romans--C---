@@ -10,6 +10,8 @@ PontifexMaximus::~PontifexMaximus() {
 
 }
 
+
+
 std::vector<BoardCoordinates> PontifexMaximus::GetLegalMoves(const BoardImage& board_layout){
 	std::vector<BoardCoordinates> result;
 
