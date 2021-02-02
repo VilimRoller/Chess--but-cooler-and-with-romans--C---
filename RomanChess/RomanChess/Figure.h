@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <functional>
 #include <optional>
+#include <cmath>
 #include "Constants.h"
 #include "ID.h"
 #include "BoardCoordinates.h"
@@ -41,12 +42,6 @@ public:
 	std::shared_ptr<sf::Sprite> GetFigureSprite() {
 		return figure_sprite_;
 	}
-		
-
-
-	int GetID() const {
-		return figureID_;
-	}
 
 	auto GetEnemyColourLambda() {
 		return GetFigureColour() == figureColour::Red ? IsPlacePurpleLambda : IsPlaceRedLambda;
@@ -57,6 +52,14 @@ public:
 		position_ = new_poistion;
 	}
 
+	void SetPosition(const int x_coordinate, const int y_coordinate) {
+		SetPosition(BoardCoordinates(x_coordinate, y_coordinate));
+	}
+
+	void SetScaledPosition(const sf::Vector2f& new_position) {
+		SetPosition(BoardCoordinates(static_cast<int>(std::round(new_position.x) / Constants::PixelMultiplier), 
+									 static_cast<int>(std::round(new_position.y) / Constants::PixelMultiplier)));
+	}
 
 	void SetFigureType(const figureType& figure_type) {
 		figure_image_.first = figure_type;
@@ -94,7 +97,6 @@ public:
 	
 	void InitializeFigure(
 		figureColour figure_colour, figureType figure_type, BoardCoordinates initial_position, int figure_number) {
-
 		SetFigureColour(figure_colour);
 		SetFigureType(figure_type);
 		SetPosition(initial_position);
@@ -104,9 +106,14 @@ public:
 	void InitializeFigureSprite(const sf::Texture& figure_texture) {
 		figure_sprite_ = std::make_shared<sf::Sprite>();
 		SetFigureTextureRect();
+		SetFigureSpritePosition();
+
+		figure_sprite_->setTexture(figure_texture);
+	}
+
+	void SetFigureSpritePosition() {
 		figure_sprite_->setPosition(static_cast<float>(GetPosition().x * Constants::PixelMultiplier),
 									static_cast<float>(GetPosition().y * Constants::PixelMultiplier));
-		figure_sprite_->setTexture(figure_texture);
 	}
 
 	void SetTextureRect(const std::pair<sf::Vector2i, sf::Vector2i>& figure_sprite_rect_pos) {

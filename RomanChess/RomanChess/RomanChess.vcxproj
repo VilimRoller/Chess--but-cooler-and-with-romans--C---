@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BadColourException.h" />
-    <ClInclude Include="Board.h" />
     <ClInclude Include="BoardCanvas.h" />
     <ClInclude Include="BoardCoordinates.h" />
     <ClInclude Include="ChessApp.h" />
@@ -43,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BadColourException.cpp" />
-    <ClCompile Include="Board.cpp" />
     <ClCompile Include="BoardCanvas.cpp" />
     <ClCompile Include="ChessApp.cpp" />
     <ClCompile Include="Consul.cpp" />

@@ -35,22 +35,22 @@ public:
 
 	void MakeNewBoardCanvas(wxWindow* ParentWindow);
 
-	void GetAllSprites();
+	
 
 	void InitializeBoardSprite();
+	void InitializeCanvasSpritePointers();
 
 private:
 	bool is_game_over_ = false;
-	figureColour player_turn_;
+	figureColour player_turn_ = figureColour::no_colour;
+
 	RomanChessFigures figures_;
+
 	sf::Texture board_texture_;
 	sf::Texture figure_textures_;
-
-	std::vector<std::shared_ptr<sf::Sprite>> all_sprites_;
 
 	std::shared_ptr<sf::Sprite> board_sprite_;
 
 	std::shared_ptr<BoardCanvas> board_canvas_;
 	BoardImage board_image_;
 };
-
