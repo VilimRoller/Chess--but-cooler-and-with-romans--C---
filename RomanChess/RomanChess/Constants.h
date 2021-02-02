@@ -7,12 +7,13 @@
 
 using FigureImage = std::pair<figureType, figureColour>;
 
+
 namespace Constants {
 	constexpr short int boardSize = 8;
-
-	//Maximum number of figures
-
+	constexpr int dequeMovesNumber = 16;
 	constexpr int PixelMultiplier = 100;
+
+#pragma region FIGURE_IMAGES
 	constexpr FigureImage VelesImage_red			  { figureType::Veles,			 figureColour::Red };
 	constexpr FigureImage VelesImage_purple			  { figureType::Veles,			 figureColour::Purple };
 	constexpr FigureImage HastatusImage_red			  { figureType::Hastatus,		 figureColour::Red };
@@ -28,13 +29,14 @@ namespace Constants {
 	constexpr FigureImage PontifexMaximusImage_red	  { figureType::PontifexMaximus, figureColour::Red };
 	constexpr FigureImage PontifexMaximusImage_purple { figureType::PontifexMaximus, figureColour::Purple };
 	constexpr FigureImage EmptyFigureImage			  { figureType::no_type,		 figureColour::no_colour };
+#pragma endregion
 
+#pragma region BOARD
+	using BoardImage = std::array<std::array<FigureImage, boardSize>, boardSize>;
 	constexpr std::array<FigureImage, boardSize> EmptyFigureLine{ {
 		EmptyFigureImage, EmptyFigureImage, EmptyFigureImage, EmptyFigureImage,
 		EmptyFigureImage, EmptyFigureImage, EmptyFigureImage, EmptyFigureImage } };
 
-	using BoardImage = std::array<std::array<FigureImage, boardSize>, boardSize>;
-	
 	constexpr BoardImage initialBoardImage {{
 		{{ TriariusImage_purple, PrincepsImage_purple, EquesImage_purple, ConsulImage_purple,
 		ConsulImage_purple, PontifexMaximusImage_purple, PrincepsImage_purple, TriariusImage_purple }},
@@ -51,7 +53,7 @@ namespace Constants {
 		ConsulImage_red, PontifexMaximusImage_red, PrincepsImage_red, TriariusImage_red }}
 	}};
 	
-	
+#pragma endregion
 
 
 }
@@ -60,6 +62,7 @@ namespace ImagePaths {
 	inline const std::string Board =	"images/Board.PNG";
 	inline const std::string Figures =  "images/Figures.PNG";
 }
+
 
 namespace SFMLConstants {
 	const sf::Vector2i FigureSpriteRectSize(100, 100);
@@ -71,7 +74,6 @@ namespace SFMLConstants {
 	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Eques			(sf::Vector2(400, 0), sf::Vector2(400, 100));
 	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Consul			(sf::Vector2(500, 0), sf::Vector2(500, 100));
 	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_PontifexMaximus (sf::Vector2(600, 0), sf::Vector2(600, 100));
-
 }
 
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <utility>
+#include <deque>
 #include "ID.h"
 #include "Constants.h"
 #include "FigureIncludes.h"
@@ -88,6 +89,15 @@ public:
     std::pair<int, int> GetNumberOfConsuls();
     bool BothSidesHaveConsul(const std::pair<int, int>& consuls);
     void DisplayGameOverMessageBox();
+    void SaveBoardImage();
+    void ClearBoardImageDeque();
+    void RemovePontifexMaximus(const figureColour& figure_colour);
+    void RemoveIfPontifexMaximus(const figureColour& figure_colour, std::shared_ptr<Figure>& figure);
+    void RemoveFigure(std::shared_ptr<Figure>& figure);
+    bool CheckIfPontifexMaximus(std::shared_ptr<Figure>& figure);
+    void RewindBoard(const figureColour& pontifex_colour);
+    
+
 protected:
     void OnUpdate() override;
 
@@ -113,6 +123,8 @@ private:
 
 	bool is_game_over_ = false;
 	figureColour player_turn_ = figureColour::Red;
+
+    std::deque<BoardImage> board_image_deque_;
 
 };
 

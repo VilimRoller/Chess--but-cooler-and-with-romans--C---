@@ -96,13 +96,21 @@ public:
 	}
 
 	bool IsFigureRed() const{
-		return GetFigureColour() == figureColour::Red;
+		return IsFigureColour(figureColour::Red);
 	}
 
 	bool IsFigurePurple() const{
-		return GetFigureColour() == figureColour::Purple;
+		return IsFigureColour(figureColour::Purple);
 	}
 	
+	bool IsFigureColour(figureColour colour) const {
+		return colour == GetFigureColour();
+	}
+
+	bool IsFigureType(figureType type) const {
+		return type == GetType();
+	}
+
 	void InitializeFigure(
 		figureColour figure_colour, figureType figure_type, BoardCoordinates initial_position, int figure_number) {
 		SetFigureColour(figure_colour);

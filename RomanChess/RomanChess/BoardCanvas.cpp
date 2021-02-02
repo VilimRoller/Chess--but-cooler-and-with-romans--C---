@@ -116,8 +116,10 @@ void BoardCanvas::HandleCanvasEvent() {
 }
 
 void BoardCanvas::HandleMouseButtonPressedEvent(sf::Event& mouse_event) {
-    EnableDragging();
-    SetEventFigureSpritePtr(mouse_event);
+	if (!IsGameOver()) {
+		EnableDragging();
+		SetEventFigureSpritePtr(mouse_event);
+	}
 }
 
 void BoardCanvas::HandleMouseButtonReleasedEvent(sf::Event& mouse_event) {
@@ -201,7 +203,6 @@ void BoardCanvas::SetEventFigurePosition(sf::Event& mouse_event) {
 		
 		MoveEventFigure(mouse_coordinates.first, mouse_coordinates.second);
 		CheckGameOver();
-		NextPlayerTurn();
 		RefreshEventFigureSpritePosition();
     }
 }
@@ -224,7 +225,7 @@ std::pair<int, int> BoardCanvas::GetMouseIntegerCoordinates(const std::pair<int,
 
 std::pair<int, int> BoardCanvas::GetOffsettedMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const {
 	std::pair<int, int> result;
-	result.first = (mouse_coordinates.first - static_cast<int>(event_figure_offset_.x)) / Constants::PixelMultiplier;
+	result.first =  (mouse_coordinates.first - static_cast<int>(event_figure_offset_.x)) / Constants::PixelMultiplier;
 	result.second = (mouse_coordinates.second - static_cast<int>(event_figure_offset_.x)) / Constants::PixelMultiplier;
 
 	return result;
@@ -296,11 +297,59 @@ bool BoardCanvas::BothSidesHaveConsul(const std::pair<int, int>& consuls) {
 }
 
 void BoardCanvas::DisplayGameOverMessageBox() {
-	player_turn_ == figureColour::Red? wxMessageBox(wxConstantStrings::GameOverWinnerRedMessage) :
-									   wxMessageBox(wxConstantStrings::GameOverWinnerPurpleMessage);
+	player_turn_ == figureColour::Purple? wxMessageBox(wxConstantStrings::GameOverWinnerRedMessage) :
+										  wxMessageBox(wxConstantStrings::GameOverWinnerPurpleMessage);
 }
 
-bool BoardCanvas::IsEventFigureRightColour() const {
+void BoardCanvas::SaveBoardImage() {
+	board_image_deque_.emplace_back(MakeBoardImage(figures_));
+	if (board_image_deque_.size() > Constants::dequeMovesNumber) {
+		board_image_deque_.pop_front();
+	}
+}
+
+inline void BoardCanvas::ClearBoardImageDeque() {
+	board_image_deque_.clear();
+}
+
+void BoardCanvas::RemovePontifexMaximus(const figureColour& figure_colour) {
+	for (auto& line : figures_) {
+		for (auto& figure_ptr : line) {
+			RemoveIfPontifexMaximus(figure_colour, figure_ptr);
+		}
+	}
+}
+
+inline void BoardCanvas::RemoveIfPontifexMaximus(const figureColour& figure_colour, std::shared_ptr<Figure>& figure) {
+	if (IsFigurePtrInitialized(figure)) {
+		if (figure->IsFigureColour(figure_colour) && figure->IsFigureType(figureType::PontifexMaximus)) {
+			RemoveFigure(figure);
+		}
+	}
+}
+
+inline void BoardCanvas::RemoveFigure(std::shared_ptr<Figure>& figure) {
+	figure = nullptr;
+}
+
+bool BoardCanvas::CheckIfPontifexMaximus(std::shared_ptr<Figure>& figure) {
+	if (IsFigurePtrInitialized(figure)) {
+		if (figure->IsFigureType(figureType::PontifexMaximus)) {
+			RewindBoard(figure->GetFigureColour());
+			return true;
+		}
+	}
+	return false;
+}
+
+void BoardCanvas::RewindBoard(const figureColour& pontifex_colour) {
+	auto past_board_layout = board_image_deque_[0];
+	ClearBoardImageDeque();
+	InitializeRomanChessFigures(past_board_layout);
+	RemovePontifexMaximus(pontifex_colour);
+}
+
+inline bool BoardCanvas::IsEventFigureRightColour() const {
 	if (IsFigurePtrInitialized(event_figure_ptr_)) {
 		return event_figure_ptr_->GetFigureColour() == GetPlayerTurnColour();
 	}
@@ -313,9 +362,13 @@ inline void BoardCanvas::SetBoardImage(BoardImage new_image) {
 
 void BoardCanvas::MoveEventFigure(const int x_coordinate, const int y_coordinate) {
 	if (IsEventMovable(x_coordinate, y_coordinate)) {
-		SetFigurePtr(x_coordinate, y_coordinate);
-		ResetOldEventFigurePosition();
-		SetEventFigurePosition(x_coordinate, y_coordinate);
+		if (!CheckIfPontifexMaximus(figures_[y_coordinate][x_coordinate])) {
+			SetFigurePtr(x_coordinate, y_coordinate);
+			ResetOldEventFigurePosition();
+			SetEventFigurePosition(x_coordinate, y_coordinate);
+		}
+		SaveBoardImage();
+		NextPlayerTurn();
 	}
 }
 
