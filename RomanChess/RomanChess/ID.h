@@ -14,7 +14,7 @@ enum class figureType {
 enum class figureColour {
 	Red = 'R',
 	Purple = 'P',
-	no_colour = 'N'
+	no_colour = 0
 };
 
 enum class spriteID {

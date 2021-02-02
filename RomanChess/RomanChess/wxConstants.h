@@ -34,4 +34,7 @@ namespace wxConstantStrings {
 
 	const wxString FileNotSavedHeadline = wxT("File not saved notification");
 	const wxString FileNotSavedMessage = wxT("This game has not been saved. Do you wish to quit anyway?");
+
+	const wxString GameOverWinnerRedMessage = wxT("Game Over! \n Red player won!");
+	const wxString GameOverWinnerPurpleMessage = wxT("Game Over! \n Purple player won!");
 }

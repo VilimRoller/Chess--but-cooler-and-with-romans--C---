@@ -11,17 +11,6 @@ namespace Constants {
 	constexpr short int boardSize = 8;
 
 	//Maximum number of figures
-	constexpr unsigned short int velesMaxNum = 5;
-	constexpr unsigned short int hastatusMaxNum = 3;
-	constexpr unsigned short int princepsMaxNum = 2;
-	constexpr unsigned short int triariusMaxNum = 2;
-	constexpr unsigned short int equesMaxNum = 1;
-	constexpr unsigned short int consulMaxNum = 2;
-	constexpr unsigned short int pontifexMaximusMaxNum = 1;
-
-	constexpr unsigned short int figureImageTypesNumber = 14;
-	constexpr unsigned short int figureTypesNum = 8;
-	constexpr unsigned short int numOfFiguresPerPlayer = 16;
 
 	constexpr int PixelMultiplier = 100;
 	constexpr FigureImage VelesImage_red			  { figureType::Veles,			 figureColour::Red };

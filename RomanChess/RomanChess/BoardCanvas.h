@@ -26,12 +26,11 @@ public:
     void InitializeRomanChessFigures(const BoardImage& board_image);
     void SetFigure(const FigureImage& figure, const BoardCoordinates& position);
 
+    
     void DrawAllFigures();
     void DrawBoard();
 
-    void ClearCanvas() {
-        clear(sf::Color(128, 128, 128));
-    }
+    void ClearCanvas();
 
     void DrawSprites();
     void HandleCanvasEvent();
@@ -40,60 +39,65 @@ public:
     void HandleMouseButtonReleasedEvent(sf::Event& mouse_event);
     void HandleMouseMovedEvent(sf::Event& mouse_event);
 
-    void EnableDragging() {
-        is_dragging_enabled_ = true;
-    }
-    void DisableDragging() {
-        is_dragging_enabled_ = false;
-    }
+    void EnableDragging();
+    void DisableDragging();
 
-    bool IsDraggingEnabled() {
-        return is_dragging_enabled_;
-    }
+    bool IsDraggingEnabled();
 
-    void SetFigureEventSpritePtr(sf::Event& mouse_event);
+    void SetEventFigureSpritePtr(sf::Event& mouse_event);
+    void SetEventFigurePtr(const int x_coordinate, const int y_coordinate);
+    void ResetEventFigurePtr();
+    void ResetEventFigureOffset();
 
-    void ResetEventFigurePtrPtr() {
-        event_figure_ptr_ = nullptr;
-    }
+    bool IsOnCanvas(const int x_coordinate, const int y_coordinate) const;
+    bool IsOnCanvas(sf::Vector2f coordinates);
 
-    void ResetEventFigureOffset() {
-        event_figure_offset_ = sf::Vector2f(0, 0);
-    }
-
-    bool IsOnCanvas(int x_coordinate, int y_coordinate) {
-        return (x_coordinate < Constants::boardSize) && (y_coordinate < Constants::boardSize)
-            && (x_coordinate >= 0)                   && (y_coordinate >= 0);
-    }
-
-    bool IsOnCanvas(sf::Vector2f coordinates) {
-        int x_coordinate = static_cast<int>(std::round(coordinates.x)) / Constants::PixelMultiplier;
-        int y_coordinate = static_cast<int>(std::round(coordinates.y)) / Constants::PixelMultiplier;
-
-        return IsOnCanvas(x_coordinate, y_coordinate);
-    }
-
-    void MoveEventSprite(const sf::Vector2f& mouse_position) {
-        if (event_figure_ptr_ != nullptr) {
-            auto current_position = event_figure_ptr_->GetFigureSprite()->getPosition();
-            auto position_offset = mouse_position - current_position - event_figure_offset_;
-            event_figure_ptr_->GetFigureSprite()->move(position_offset);
-        }
-    }
+    void MoveEventSprite(const sf::Vector2f& mouse_position);
 
     void SetEventFigurePosition(sf::Event& mouse_event);
-    void SetBoardImage(BoardImage new_image = Constants::initialBoardImage) {
-        board_image = new_image;
-    }
+    void SetBoardImage(BoardImage new_image = Constants::initialBoardImage);
 
+    void MoveEventFigure(const int x_coordinate, const int y_coordinate);
+
+    bool IsEventFigure(const int x_coordinate, const int y_coordinate) const;
+    bool IsEventMoveLegal(const int x_coordinate, const int y_coordinate) const;
+    bool IsEventMovable(const int x_coordinate, const int y_coordinate) const;
+    bool IsEventFigureRightColour() const;
+
+    void SetFigurePtr(const int x_coordinate, const int y_coordinate);
+
+    void ResetOldEventFigurePosition();
+    void RefreshEventFigureSpritePosition();
+
+    void SetEventFigurePosition(const int x_coordinate, const int y_coordinate);
+
+    bool IsFigurePtrInitialized(std::shared_ptr<Figure> figure_ptr) const;
+
+    sf::Vector2f GetMouseVectorCoordinates(const int x_coordinate, const int y_coordinate) const;
+    std::pair<int, int> GetMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
+    std::pair<int, int> GetOffsettedMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
+
+    void RefreshBoardImage();
+
+    BoardImage MakeBoardImage(const RomanChessFigures& figures);
+    figureColour GetPlayerTurnColour() const;
+    void CheckGameOver();
+    void SetGameOver();
+    void NextPlayerTurn();
+    bool IsGameOver() const;
+    std::pair<int, int> GetNumberOfConsuls();
+    bool BothSidesHaveConsul(const std::pair<int, int>& consuls);
+    void DisplayGameOverMessageBox();
 protected:
     void OnUpdate() override;
 
 private:
     //Pointer to figure modified by events
     std::shared_ptr<Figure> event_figure_ptr_;
-    sf::Vector2f event_figure_offset_;
-
+    
+    // Distance from top left corner of sprite to mouse position
+    sf::Vector2f event_figure_offset_; 
+    
     sf::Event canvas_event_;
 
     bool is_dragging_enabled_ = false;
@@ -105,7 +109,10 @@ private:
     std::shared_ptr<sf::Sprite> board_sprite_;
     RomanChessFigures figures_;
 
-    BoardImage board_image;
+    BoardImage board_image_;
+
+	bool is_game_over_ = false;
+	figureColour player_turn_ = figureColour::Red;
 
 };
 

@@ -23,7 +23,7 @@ class Figure
 public:
 	//Getters
 
-	FigureImage GetImage() const {
+	FigureImage GetFigureImage() const {
 		return figure_image_;
 	}
 
@@ -44,7 +44,7 @@ public:
 	}
 
 	auto GetEnemyColourLambda() {
-		return GetFigureColour() == figureColour::Red ? IsPlacePurpleLambda : IsPlaceRedLambda;
+		return IsFigureRed() ? IsPlacePurpleLambda : IsPlaceRedLambda;
 	}
 
 	//Setters
@@ -69,14 +69,14 @@ public:
 		figure_image_.second = figure_colour;
 	}
 
-	void SetFigureNumber(const int new_number) {
-		figureID_ = new_number;
-	}
 
 	void InitializeFigureLambdas() {
-		IsPlaceEmptyLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) {return IsPlaceEmpty(board_layout, position); };
-		IsPlaceRedLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) {return IsPlaceRed(board_layout, position); };
-		IsPlacePurpleLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) {return IsPlacePurple(board_layout, position); };
+		IsPlaceEmptyLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) 
+								{return IsPlaceEmpty(board_layout, position); };
+		IsPlaceRedLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) 
+							  {return IsPlaceRed(board_layout, position); };
+		IsPlacePurpleLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) 
+								 {return IsPlacePurple(board_layout, position); };
 	}
 
 	FigureImage GetEmptyFigure() const {
@@ -93,6 +93,14 @@ public:
 
 	bool IsEmpty(const FigureImage& figure_image) const {
 		return figure_image == GetEmptyFigure();
+	}
+
+	bool IsFigureRed() const{
+		return GetFigureColour() == figureColour::Red;
+	}
+
+	bool IsFigurePurple() const{
+		return GetFigureColour() == figureColour::Purple;
 	}
 	
 	void InitializeFigure(
@@ -117,7 +125,7 @@ public:
 	}
 
 	void SetTextureRect(const std::pair<sf::Vector2i, sf::Vector2i>& figure_sprite_rect_pos) {
-		GetFigureColour() == figureColour::Red ?
+		IsFigureRed() ?
 			figure_sprite_->setTextureRect(sf::IntRect(figure_sprite_rect_pos.first, SFMLConstants::FigureSpriteRectSize)) :
 			figure_sprite_->setTextureRect(sf::IntRect(figure_sprite_rect_pos.second, SFMLConstants::FigureSpriteRectSize));
 	}
@@ -164,64 +172,64 @@ public:
 	//Surrounding is analyzed from figure's point of view
 	bool IsPlaceEmpty(const BoardImage& board_layout, const BoardCoordinates& position) {
 		if (IsStillOnBoard(position)) {
-			return IsEmpty(board_layout[position.x][position.y]);
+			return IsEmpty(board_layout[position.y][position.x]);
 		}
 		return false;
 	}
 
 	bool IsPlaceRed(const BoardImage& board_layout, const BoardCoordinates& position) {
 		if (IsStillOnBoard(position)) {
-			return IsRed(board_layout[position.x][position.y]);
+			return IsRed(board_layout[position.y][position.x]);
 		}
 		return false;
 	}
 
 	bool IsPlacePurple(const BoardImage& board_layout, const BoardCoordinates& position) {
 		if (IsStillOnBoard(position)) {
-			return IsPurple(board_layout[position.x][position.y]);
+			return IsPurple(board_layout[position.y][position.x]);
 		}
 		return false;
 	}
 
 
 	const BoardCoordinates MoveFront(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red?	BoardCoordinates(0, -number_of_spaces) :
-																BoardCoordinates(0, number_of_spaces));
+		return position_ + (IsFigureRed()?	BoardCoordinates(0, -number_of_spaces) :
+											BoardCoordinates(0, number_of_spaces));
 	}
 
 	const BoardCoordinates MoveBack(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red ?	BoardCoordinates(0, number_of_spaces) :
-																BoardCoordinates(0, -number_of_spaces));
+		return position_ + (IsFigureRed()?	BoardCoordinates(0, number_of_spaces) :
+											BoardCoordinates(0, -number_of_spaces));
 	}
 
 	const BoardCoordinates MoveLeft(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red ?	BoardCoordinates(-number_of_spaces, 0) :
-																BoardCoordinates(number_of_spaces, 0));
+		return position_ + (IsFigureRed()?	BoardCoordinates(-number_of_spaces, 0) :
+											BoardCoordinates(number_of_spaces, 0));
 	}
 
 	const BoardCoordinates MoveRight(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red ?	BoardCoordinates(number_of_spaces, 0) :
-																BoardCoordinates(-number_of_spaces, 0));
+		return position_ + (IsFigureRed()?	BoardCoordinates(number_of_spaces, 0) :
+											BoardCoordinates(-number_of_spaces, 0));
 	}
 
 	const BoardCoordinates MoveDiagonalLeftFront(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red ?	BoardCoordinates(-number_of_spaces, -number_of_spaces) :
-																BoardCoordinates(number_of_spaces, number_of_spaces));
+		return position_ + (IsFigureRed()?	BoardCoordinates(-number_of_spaces, -number_of_spaces) :
+											BoardCoordinates(number_of_spaces, number_of_spaces));
 	}
 
 	const BoardCoordinates MoveDiagonalLeftBack(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red ?	BoardCoordinates(-number_of_spaces, number_of_spaces) :
-																BoardCoordinates(number_of_spaces, -number_of_spaces));
+		return position_ + (IsFigureRed()?	BoardCoordinates(-number_of_spaces, number_of_spaces) :
+											BoardCoordinates(number_of_spaces, -number_of_spaces));
 	}
 
 	const BoardCoordinates MoveDiagonalRightFront(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red ?	BoardCoordinates(number_of_spaces, -number_of_spaces) :
-																BoardCoordinates(-number_of_spaces, number_of_spaces));
+		return position_ + (IsFigureRed()?	BoardCoordinates(number_of_spaces, -number_of_spaces) :
+											BoardCoordinates(-number_of_spaces, number_of_spaces));
 	}
 
 	const BoardCoordinates MoveDiagonalRightBack(const int number_of_spaces = 1) const {
-		return position_ + (GetFigureColour() == figureColour::Red ?	BoardCoordinates(number_of_spaces, number_of_spaces) :
-																BoardCoordinates(-number_of_spaces, -number_of_spaces));
+		return position_ + (IsFigureRed() ?	BoardCoordinates(number_of_spaces, number_of_spaces) :
+											BoardCoordinates(-number_of_spaces, -number_of_spaces));
 	}
 
 	//Validate figure's move to position
@@ -264,6 +272,5 @@ public:
 private:
 	BoardCoordinates position_;
 	FigureImage figure_image_;
-	int figureID_;
 	
 };
