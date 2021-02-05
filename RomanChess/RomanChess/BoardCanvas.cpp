@@ -12,16 +12,39 @@ BoardCanvas::BoardCanvas(wxWindow* Parent,
 	LoadTextures();
 	InitializeBoardSprite();
 	InitializeRomanChessFigures(board_image_);
+	InitializeRectangleSprites();
 }
 
 void BoardCanvas::LoadTextures() {
 	board_texture_.loadFromFile(ImagePaths::Board);
 	figure_textures_.loadFromFile(ImagePaths::Figures);
+	yellow_rectangle_texture_.loadFromFile(ImagePaths::Yellow_Rectangle);
+	red_rectangle_texture_.loadFromFile(ImagePaths::Red_Rectangle);
 }
 
 void BoardCanvas::InitializeBoardSprite() {
-	board_sprite_ = std::make_shared<sf::Sprite>();
-	board_sprite_->setTexture(board_texture_);
+	board_sprite_.setTexture(board_texture_);
+}
+
+void BoardCanvas::InitializeRectangleSprites() {
+	for (int row = 0; row < Constants::boardSize; ++row) {
+		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
+			SetRectangleSpriteTexture(row, collumn);
+			SetRectangleSpritePosition(row, collumn);
+		}
+	}
+}
+
+void BoardCanvas::SetRectangleSpriteTexture(const int row, const int collumn) {
+	yellow_rectangles_[row][collumn].setTexture(yellow_rectangle_texture_);
+	red_rectangles_[row][collumn].setTexture(red_rectangle_texture_);
+}
+
+void BoardCanvas::SetRectangleSpritePosition(const int row, const int collumn) {
+	yellow_rectangles_[row][collumn].setPosition(GetVectorCoordinates(collumn * Constants::PixelMultiplier,
+																	  row	  * Constants::PixelMultiplier));
+	red_rectangles_[row][collumn].setPosition(GetVectorCoordinates(collumn * Constants::PixelMultiplier, 
+																   row	   * Constants::PixelMultiplier));
 }
 
 void BoardCanvas::InitializeRomanChessFigures(const BoardImage& board_image) {
@@ -33,7 +56,6 @@ void BoardCanvas::InitializeRomanChessFigures(const BoardImage& board_image) {
 }
 
 void BoardCanvas::SetFigure(const FigureImage& figure, const BoardCoordinates& position) {
-
 	switch (figure.first) {
 	case figureType::Veles:
 		figures_[position.y][position.x] = std::make_shared<Veles>(figure.second, position);
@@ -59,6 +81,10 @@ void BoardCanvas::SetFigure(const FigureImage& figure, const BoardCoordinates& p
 	default:
 		figures_[position.y][position.x] = nullptr;
 	}
+	MakeFigureSprite(position);
+}
+
+inline void BoardCanvas::MakeFigureSprite(const BoardCoordinates& position) {
 	if (figures_[position.y][position.x] != nullptr) {
 		figures_[position.y][position.x]->InitializeFigureSprite(figure_textures_);
 	}
@@ -67,41 +93,56 @@ void BoardCanvas::SetFigure(const FigureImage& figure, const BoardCoordinates& p
 void BoardCanvas::OnUpdate() {
     HandleCanvasEvent();
     DrawSprites();
-    
 }
 
-void BoardCanvas::DrawAllFigures() {
+inline void BoardCanvas::DrawRedRectangles() {
+	for (const auto& coordinate : red_rectangle_positions_) {
+		draw(red_rectangles_[coordinate.y][coordinate.x]);
+	}
+}
+
+inline void BoardCanvas::DrawYellowRectangles() {
+	for (const auto& coordinate : yellow_rectangle_positions_) {
+		draw(yellow_rectangles_[coordinate.y][coordinate.x]);
+	}
+}
+
+inline void BoardCanvas::DrawRectangles() {
+	if (is_drawing_rectangles_enabled_) {
+		DrawYellowRectangles();
+		DrawRedRectangles();
+	}
+}
+
+inline void BoardCanvas::DrawAllFigures() {
     for (const auto& row : figures_) {
         for (const auto& figure_ptr : row) {
-            if (figure_ptr != nullptr) {
-                draw(*(figure_ptr->GetFigureSprite()));
+            if (IsFigureOnTile(figure_ptr)) {
+                draw(figure_ptr->GetFigureSprite());
             }
         }
     }
 }
 
-void BoardCanvas::DrawBoard() {
-    if (board_sprite_ != nullptr) {
-        draw(*board_sprite_);
-    }
+inline void BoardCanvas::DrawBoard() {
+        draw(board_sprite_);
 }
 
-void BoardCanvas::ClearCanvas() {
+inline void BoardCanvas::ClearCanvas() {
 	clear(sf::Color(128, 128, 128));
 }
 
-void BoardCanvas::DrawSprites() {
+inline void BoardCanvas::DrawSprites() {
 	ClearCanvas();
 	DrawBoard();
 	DrawAllFigures();
+	DrawRectangles();
 }
 
 void BoardCanvas::HandleCanvasEvent() {
 
     while (this->pollEvent(canvas_event_)) {
-
         switch (canvas_event_.type) {
-
         case sf::Event::MouseMoved:
             HandleMouseMovedEvent(canvas_event_);
             break;
@@ -127,12 +168,13 @@ void BoardCanvas::HandleMouseButtonReleasedEvent(sf::Event& mouse_event) {
     DisableDragging();
     ResetEventFigurePtr();
     ResetEventFigureOffset();
+	ResetRectangleCoordinates();
 	RefreshBoardImage();
 }
 
 void BoardCanvas::HandleMouseMovedEvent(sf::Event& mouse_event) {
-    if (IsDraggingEnabled()) {
-		sf::Vector2f mouse_position = GetMouseVectorCoordinates(mouse_event.mouseMove.x, mouse_event.mouseMove.y);
+    if (is_dragging_enabled_) {
+		sf::Vector2f mouse_position = GetVectorCoordinates(mouse_event.mouseMove.x, mouse_event.mouseMove.y);
         
         if (IsOnCanvas(mouse_position)) {
             MoveEventSprite(mouse_position);
@@ -148,20 +190,24 @@ inline void BoardCanvas::DisableDragging() {
 	is_dragging_enabled_ = false;
 }
 
-inline bool BoardCanvas::IsDraggingEnabled() {
-	return is_dragging_enabled_;
+void BoardCanvas::EnableDrawingRectangles() {
+	is_drawing_rectangles_enabled_ = true;
+}
+
+void BoardCanvas::DisableDrawingRectangles() {
+	is_drawing_rectangles_enabled_ = false;
 }
 
 void BoardCanvas::SetEventFigureSpritePtr(sf::Event& mouse_event) {
     int x_coordinate = mouse_event.mouseButton.x / Constants::PixelMultiplier;
     int y_coordinate = mouse_event.mouseButton.y / Constants::PixelMultiplier;
+	sf::Vector2f mouse_vector_coordinates = GetVectorCoordinates(mouse_event.mouseButton.x, 
+																 mouse_event.mouseButton.y);
 
-	sf::Vector2f mouse_vector_coordinates = GetMouseVectorCoordinates(mouse_event.mouseButton.x, mouse_event.mouseButton.y);
-
-    if(IsOnCanvas(x_coordinate, y_coordinate) && IsFigurePtrInitialized(figures_[y_coordinate][x_coordinate])) {
+    if(IsOnCanvas(x_coordinate, y_coordinate) && IsFigureOnTile(figures_[y_coordinate][x_coordinate])) {
+		SetRectangleCoordinates(x_coordinate, y_coordinate);
 		SetEventFigurePtr(x_coordinate, y_coordinate);
-        sf::Vector2f event_figure_coordinates = event_figure_ptr_->GetFigureSprite()->getPosition();
-        event_figure_offset_ = mouse_vector_coordinates - event_figure_coordinates;
+		SetEventFigureOffset(mouse_vector_coordinates);
     }
 }
 
@@ -173,8 +219,42 @@ inline void BoardCanvas::ResetEventFigurePtr() {
 	event_figure_ptr_ = nullptr;
 }
 
+inline void BoardCanvas::SetEventFigureOffset(const sf::Vector2f& mouse_vector_coordinates) {
+	sf::Vector2f event_figure_coordinates = event_figure_ptr_->GetFigureSprite().getPosition();
+	event_figure_offset_ = mouse_vector_coordinates - event_figure_coordinates;
+}
+
 inline void BoardCanvas::ResetEventFigureOffset() {
 	event_figure_offset_ = sf::Vector2f(0, 0);
+}
+
+void BoardCanvas::SetRectangleCoordinates(const int x_coordinate, const int y_coordinate) {
+	EnableDrawingRectangles();
+	RefreshBoardImage();
+	std::vector<BoardCoordinates> all_rectangle_coordinates = figures_[y_coordinate][x_coordinate]->GetLegalMoves(board_image_);
+
+	for (const auto& coordinate : all_rectangle_coordinates) {
+		EmplaceRectangleCoordinate(coordinate);
+	}
+}
+
+inline void BoardCanvas::EmplaceRectangleCoordinate(const BoardCoordinates& coordinate) {
+	if (IsFigureOnTile(figures_[coordinate.y][coordinate.x])) {
+		red_rectangle_positions_.emplace_back(coordinate);
+	}
+	else {
+		yellow_rectangle_positions_.emplace_back(coordinate);
+	}
+}
+
+void BoardCanvas::ResetRectangleCoordinates() {
+	DisableDrawingRectangles();
+	ClearRectangleVectors();
+}
+
+inline void BoardCanvas::ClearRectangleVectors() {
+	yellow_rectangle_positions_.clear();
+	red_rectangle_positions_.clear();
 }
 
 inline bool BoardCanvas::IsOnCanvas(const int x_coordinate, const int y_coordinate) const {
@@ -190,15 +270,15 @@ inline bool BoardCanvas::IsOnCanvas(sf::Vector2f coordinates) {
 }
 
 void BoardCanvas::MoveEventSprite(const sf::Vector2f& mouse_position) {
-	if (IsFigurePtrInitialized(event_figure_ptr_)) {
-		sf::Vector2f current_position = event_figure_ptr_->GetFigureSprite()->getPosition();
+	if (IsFigureOnTile(event_figure_ptr_)) {
+		sf::Vector2f current_position = event_figure_ptr_->GetFigureSprite().getPosition();
 		sf::Vector2f position_offset = mouse_position - current_position - event_figure_offset_;
-		event_figure_ptr_->GetFigureSprite()->move(position_offset);
+		event_figure_ptr_->GetFigureSprite().move(position_offset);
 	}
 }
 
 void BoardCanvas::SetEventFigurePosition(sf::Event& mouse_event) {
-    if (IsFigurePtrInitialized(event_figure_ptr_)) {
+    if (IsFigureOnTile(event_figure_ptr_)) {
 		auto mouse_coordinates = GetMouseIntegerCoordinates(std::make_pair(mouse_event.mouseButton.x, mouse_event.mouseButton.y));
 		
 		MoveEventFigure(mouse_coordinates.first, mouse_coordinates.second);
@@ -207,11 +287,11 @@ void BoardCanvas::SetEventFigurePosition(sf::Event& mouse_event) {
     }
 }
 
-inline bool BoardCanvas::IsFigurePtrInitialized(std::shared_ptr<Figure> figure_ptr) const{
+inline bool BoardCanvas::IsFigureOnTile(const std::shared_ptr<Figure>& figure_ptr) const{
 	return figure_ptr != nullptr;
 }
 
-inline sf::Vector2f BoardCanvas::GetMouseVectorCoordinates(const int x_coordinate, const int y_coordinate) const {
+inline sf::Vector2f BoardCanvas::GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const {
 	return sf::Vector2f(static_cast<float>(x_coordinate), static_cast<float>(y_coordinate));
 }
 
@@ -241,7 +321,7 @@ BoardImage BoardCanvas::MakeBoardImage(const RomanChessFigures& figures) {
 
 	for (int y_coordinate = 0; y_coordinate < Constants::boardSize; ++y_coordinate) {
 		for (int x_coordinate = 0; x_coordinate < Constants::boardSize; ++x_coordinate) {
-			if (IsFigurePtrInitialized(figures[y_coordinate][x_coordinate])) {
+			if (IsFigureOnTile(figures[y_coordinate][x_coordinate])) {
 				result[y_coordinate][x_coordinate] = figures[y_coordinate][x_coordinate]->GetFigureImage();
 			}
 		}
@@ -275,21 +355,25 @@ inline bool BoardCanvas::IsGameOver() const {
 
 std::pair<int, int> BoardCanvas::GetNumberOfConsuls() {
 	std::pair<int, int> result(0, 0);
-	for (const auto& line : figures_) {
-		for (const auto& figure_ptr : line) {
-			if (IsFigurePtrInitialized(figure_ptr)) {
-				if (figure_ptr->GetType() == figureType::Consul) {
-					if (figure_ptr->IsFigureRed()) {
-						++result.first;
-					}
-					else if (figure_ptr->IsFigurePurple()) {
-						++result.second;
-					}
-				}
+	for (const auto& row : figures_) {
+		for (const auto& figure_ptr : row) {
+			if (IsFigureOnTile(figure_ptr)) {
+				AddNumberOfConsuls(figure_ptr, result);
 			}
 		}
 	}
 	return result;
+}
+
+void BoardCanvas::AddNumberOfConsuls(const std::shared_ptr<Figure>& figure, std::pair<int, int>& consul_number) {
+	if (figure->GetType() == figureType::Consul) {
+		if (figure->IsFigureRed()) {
+			++consul_number.first;
+		}
+		else if (figure->IsFigurePurple()) {
+			++consul_number.second;
+		}
+	}
 }
 
 bool BoardCanvas::BothSidesHaveConsul(const std::pair<int, int>& consuls) {
@@ -321,7 +405,7 @@ void BoardCanvas::RemovePontifexMaximus(const figureColour& figure_colour) {
 }
 
 inline void BoardCanvas::RemoveIfPontifexMaximus(const figureColour& figure_colour, std::shared_ptr<Figure>& figure) {
-	if (IsFigurePtrInitialized(figure)) {
+	if (IsFigureOnTile(figure)) {
 		if (figure->IsFigureColour(figure_colour) && figure->IsFigureType(figureType::PontifexMaximus)) {
 			RemoveFigure(figure);
 		}
@@ -333,7 +417,7 @@ inline void BoardCanvas::RemoveFigure(std::shared_ptr<Figure>& figure) {
 }
 
 bool BoardCanvas::CheckIfPontifexMaximus(std::shared_ptr<Figure>& figure) {
-	if (IsFigurePtrInitialized(figure)) {
+	if (IsFigureOnTile(figure)) {
 		if (figure->IsFigureType(figureType::PontifexMaximus)) {
 			RewindBoard(figure->GetFigureColour());
 			return true;
@@ -350,7 +434,7 @@ void BoardCanvas::RewindBoard(const figureColour& pontifex_colour) {
 }
 
 inline bool BoardCanvas::IsEventFigureRightColour() const {
-	if (IsFigurePtrInitialized(event_figure_ptr_)) {
+	if (IsFigureOnTile(event_figure_ptr_)) {
 		return event_figure_ptr_->GetFigureColour() == GetPlayerTurnColour();
 	}
 	return false;

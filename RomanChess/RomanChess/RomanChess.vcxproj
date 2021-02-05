@@ -33,6 +33,7 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="PontifexMaximus.h" />
     <ClInclude Include="Princeps.h" />
+    <ClInclude Include="RomanChessAI.h" />
     <ClInclude Include="RomanChessGame.h" />
     <ClInclude Include="Triarius.h" />
     <ClInclude Include="Veles.h" />
@@ -51,6 +52,7 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="PontifexMaximus.cpp" />
     <ClCompile Include="Princeps.cpp" />
+    <ClCompile Include="RomanChessAI.cpp" />
     <ClCompile Include="RomanChessGame.cpp" />
     <ClCompile Include="Triarius.cpp" />
     <ClCompile Include="Veles.cpp" />

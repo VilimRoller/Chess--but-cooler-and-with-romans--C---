@@ -39,7 +39,7 @@ public:
 		return figure_image_.second;
 	}
 
-	std::shared_ptr<sf::Sprite> GetFigureSprite() {
+	sf::Sprite& GetFigureSprite() {
 		return figure_sprite_;
 	}
 
@@ -120,22 +120,22 @@ public:
 	}
 
 	void InitializeFigureSprite(const sf::Texture& figure_texture) {
-		figure_sprite_ = std::make_shared<sf::Sprite>();
+		//figure_sprite_ = std::make_shared<sf::Sprite>();
 		SetFigureTextureRect();
 		SetFigureSpritePosition();
 
-		figure_sprite_->setTexture(figure_texture);
+		figure_sprite_.setTexture(figure_texture);
 	}
 
 	void SetFigureSpritePosition() {
-		figure_sprite_->setPosition(static_cast<float>(GetPosition().x * Constants::PixelMultiplier),
+		figure_sprite_.setPosition(static_cast<float>(GetPosition().x * Constants::PixelMultiplier),
 									static_cast<float>(GetPosition().y * Constants::PixelMultiplier));
 	}
 
 	void SetTextureRect(const std::pair<sf::Vector2i, sf::Vector2i>& figure_sprite_rect_pos) {
 		IsFigureRed() ?
-			figure_sprite_->setTextureRect(sf::IntRect(figure_sprite_rect_pos.first, SFMLConstants::FigureSpriteRectSize)) :
-			figure_sprite_->setTextureRect(sf::IntRect(figure_sprite_rect_pos.second, SFMLConstants::FigureSpriteRectSize));
+			figure_sprite_.setTextureRect(sf::IntRect(figure_sprite_rect_pos.first, SFMLConstants::FigureSpriteRectSize)) :
+			figure_sprite_.setTextureRect(sf::IntRect(figure_sprite_rect_pos.second, SFMLConstants::FigureSpriteRectSize));
 	}
 
 	void SetFigureTextureRect() {
@@ -275,7 +275,7 @@ public:
 	ConditionLambdaType IsPlacePurpleLambda;
 
 
-	std::shared_ptr<sf::Sprite> figure_sprite_;
+	sf::Sprite figure_sprite_;
 
 private:
 	BoardCoordinates position_;

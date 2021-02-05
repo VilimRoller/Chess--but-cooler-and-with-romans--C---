@@ -87,6 +87,9 @@
     <ClInclude Include="FigureIncludes.h">
       <Filter>Header Files\Figures</Filter>
     </ClInclude>
+    <ClInclude Include="RomanChessAI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChessApp.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files\figures</Filter>
     </ClCompile>
     <ClCompile Include="RomanChessGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RomanChessAI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
