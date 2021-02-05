@@ -121,12 +121,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OutDir)RomanChess.lib;Veles.obj;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Husky\source\repos\VilimRoller\Chess--but-cooler-and-with-romans--C---\RomanChess\x64\Debug;C:\Users\Husky\source\repos\VilimRoller\Chess--but-cooler-and-with-romans--C---\RomanChess\RomanChess\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OutDir)RomanChess.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Husky\source\repos\VilimRoller\Chess--but-cooler-and-with-romans--C---\RomanChess\x64\Debug;C:\Users\Husky\source\repos\VilimRoller\Chess--but-cooler-and-with-romans--C---\RomanChess\RomanChess\x64\Debug;C:\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

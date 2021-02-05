@@ -13,16 +13,16 @@ namespace TestFunctions {
 
 	inline BoardImage GetEmptyBoardImage() {
 		BoardImage result;
-		for (int i = 0; i < Constants::boardSize; ++i) {
-			for (int j = 0; j < Constants::boardSize; ++j) {
-				result[i][j] = GetEmptyFigureImage();
+		for (int row = 0; row < Constants::boardSize; ++row) {
+			for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
+				result[row][collumn] = GetEmptyFigureImage();
 			}
 		}
 		return result;
 	}
 
 	inline void SetFigureImage(BoardImage& board, const FigureImage& figure, const BoardCoordinates& coordinates) {
-		board[coordinates.x][coordinates.y] = figure;
+		board[coordinates.y][coordinates.x] = figure;
 	}
 
 	inline void MakeMultipleFigureImages (FigureImage image, 
