@@ -7,10 +7,9 @@ Consul::Consul(figureColour figure_colour,
 }
 
 Consul::~Consul() {
-
 }
 
-std::vector<BoardCoordinates> Consul::GetLegalMoves(const BoardImage& board_layout) {
+std::vector<BoardCoordinates> Consul::GetLegalMoves(const BoardImage& board_layout) const {
 	std::vector<BoardCoordinates> result;
 
 	ValidateMove(board_layout, result, MoveFront(), IsPlaceEmptyLambda);

@@ -7,11 +7,9 @@ Triarius::Triarius(figureColour figure_colour,
 }
 
 Triarius::~Triarius(){
-
 }
 
-
-std::vector<BoardCoordinates> Triarius::GetLegalMoves(const BoardImage& board_layout){
+std::vector<BoardCoordinates> Triarius::GetLegalMoves(const BoardImage& board_layout) const{
 	std::vector<BoardCoordinates> result;
 
 	ValidateMove(board_layout, result, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);

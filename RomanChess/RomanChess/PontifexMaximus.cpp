@@ -7,12 +7,9 @@ PontifexMaximus::PontifexMaximus(figureColour figure_colour,
 }
 
 PontifexMaximus::~PontifexMaximus() {
-
 }
 
-
-
-std::vector<BoardCoordinates> PontifexMaximus::GetLegalMoves(const BoardImage& board_layout){
+std::vector<BoardCoordinates> PontifexMaximus::GetLegalMoves(const BoardImage& board_layout) const{
 	std::vector<BoardCoordinates> result;
 
 	ValidateMove(board_layout, result, MoveFront(), IsPlaceEmptyLambda);

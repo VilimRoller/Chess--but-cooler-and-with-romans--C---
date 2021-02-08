@@ -29,12 +29,17 @@ public:
 	void SetFigureEvaluationMap(const std::map<FigureImage, int>& evaluation_map, const figureColour& colour);
 	void SetFigureEvaluationMultiplierMap(const std::map<figureType, IntegerMap2D>& multiplier_map, const figureColour& colour);
 
-	BoardImage GetBoardImage(const RomanChessFigures& figures);
-	bool IsFigureOnTile(std::shared_ptr<Figure> tile);
-	bool IsFigureImageEmpty(const FigureImage& figure_image);
-	int GetEvaluatedBoardStrenght(const BoardImage& board);
-	int GetFigureStrengh(const BoardImage& board, const BoardCoordinates& coordinates);
+	const BoardImage GetBoardImage() const;
+	void RefreshCurrentBoardImage();
+	const BoardImage& GetCurrentBoardImage() const;
 
+	bool IsFigureOnTile(std::shared_ptr<Figure> tile) const;
+	bool IsFigureImageEmpty(const FigureImage& figure_image) const;
+
+	const int GetEvaluatedBoardStrenght();
+	const int GetFigureStrengh(const FigureImage& figure_image, const BoardCoordinates& coordinates);
+
+	int GetFigureEvaluationMultiplier(const figureType& figure_type, const figureColour& figure_colour, const BoardCoordinates& coordinates);
 
 	//bool IsGameOver(); 
 	BoardCoordinates GetBestMove(const BoardCoordinates& figure);
@@ -44,25 +49,25 @@ public:
 private:
 	const figureColour AI_player_colour_;
 
-	BoardImage current_board_layout_;
+	
 	static int moves_counter_;
 
 	//AI must track position of figures, but it is not allowed to move them
 	const RomanChessFigures const* game_figures_;
+	BoardImage current_board_image_;
 
 	const AIType AI_type_red_;
 	const AIStrategy AI_strategy_red_;
+	const AIType AI_type_purple_;
+	const AIStrategy AI_strategy_purple_;
+
+	std::map<FigureImage, int> figure_evaluation_values_map_red_;
+	std::map<figureType, IntegerMap2D> figure_evaluation_multplier_map_red_;
 
 	std::map<FigureImage, int> figure_evaluation_values_map_purple_;
 	std::map<figureType, IntegerMap2D> figure_evaluation_multplier_map_purple_;
 	
 
-	const AIType AI_type_purple_;
-	const AIStrategy AI_strategy_purple_;
-
-	//For evaluating enemy's best move
-	std::map<FigureImage, int> figure_evaluation_values_map_red_;
-	std::map<figureType, IntegerMap2D> figure_evaluation_multplier_map_red_;
 
 
 };

@@ -7,10 +7,9 @@ Eques::Eques(figureColour figure_colour,
 }
 
 Eques::~Eques() {
-
 }
 
-std::vector<BoardCoordinates> Eques::GetLegalMoves(const BoardImage& board_layout){
+std::vector<BoardCoordinates> Eques::GetLegalMoves(const BoardImage& board_layout) const {
 	std::vector<BoardCoordinates> result;
 
 	ValidateEquesMove(board_layout, result, [&](int num_of_spaces) {return MoveFront(num_of_spaces); });

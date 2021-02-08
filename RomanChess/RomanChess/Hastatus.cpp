@@ -2,18 +2,14 @@
 
 Hastatus::Hastatus(figureColour figure_colour,
 	BoardCoordinates initial_position,
-	int figure_number)
-	: number_of_kills_{ 0 } {
+	int figure_number) {
 	InitializeFigure(figure_colour, figureType::Hastatus, initial_position, figure_number);
 }
 
 Hastatus::~Hastatus() {
-
 }
 
-
-
-std::vector<BoardCoordinates> Hastatus::GetLegalMoves(const BoardImage& board_layout){
+std::vector<BoardCoordinates> Hastatus::GetLegalMoves(const BoardImage& board_layout) const {
 	std::vector<BoardCoordinates> result;
 
 	CheckFront(board_layout, result);
@@ -24,7 +20,7 @@ std::vector<BoardCoordinates> Hastatus::GetLegalMoves(const BoardImage& board_la
 	return result;
 }
 
-void Hastatus::CheckFront(const BoardImage& board_layout, std::vector<BoardCoordinates>& res) {
+void Hastatus::CheckFront(const BoardImage& board_layout, std::vector<BoardCoordinates>& res) const {
 	for (int num_of_moves = 1; num_of_moves < 3; ++num_of_moves) {
 		if (!ValidateMove(board_layout, res, MoveFront(num_of_moves), IsPlaceEmptyLambda)) {
 			break;

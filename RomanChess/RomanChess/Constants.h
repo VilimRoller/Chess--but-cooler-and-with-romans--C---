@@ -12,7 +12,8 @@ using FigureImage = std::pair<figureType, figureColour>;
 
 namespace Constants {
 	constexpr int boardSize = 8;
-	constexpr int dequeMovesNumber = 16;
+	constexpr int lastBoardElement = boardSize - 1;
+	constexpr int dequeMovesNumber = 20;
 	constexpr int PixelMultiplier = 100;
 
 #pragma region FIGURE_IMAGES
@@ -221,10 +222,10 @@ namespace Constants {
 			{{ 5,  8,  8,  8,  8,  8,  8,  5}},
 			{{ 8, 10, 10, 10, 10, 10, 10,  8}},
 			{{ 8, 10, 10, 10, 10, 10, 10,  8}},
-			{{ 8, 12, 15, 15, 15, 15, 15,  8}},
-			{{ 8, 16, 20, 20, 20, 20, 16,  8}},
-			{{ 8, 16, 20, 20, 20, 20, 16,  8}},
-			{{ 8, 16, 20, 20, 20, 20, 16,  8}},
+			{{ 8, 10, 10, 10, 10, 10, 10,  8}},
+			{{ 8, 10, 10, 10, 10, 10, 10,  8}},
+			{{ 8, 10, 10, 10, 10, 10, 10,  8}},
+			{{ 8, 10, 10, 10, 10, 10, 10,  8}},
 			{{ 5,  8,  8,  8,  8,  8,  8,  5}}
 			} };
 

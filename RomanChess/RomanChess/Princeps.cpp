@@ -8,12 +8,9 @@ Princeps::Princeps(figureColour figure_colour,
 }
 
 Princeps::~Princeps() {
-
 }
 
-
-
-std::vector<BoardCoordinates> Princeps::GetLegalMoves(const BoardImage& board_layout){
+std::vector<BoardCoordinates> Princeps::GetLegalMoves(const BoardImage& board_layout) const {
 	std::vector<BoardCoordinates> result;
 
 	ValidateMove(board_layout, result, MoveFront(), IsPlaceEmptyLambda);

@@ -10,7 +10,7 @@ public:
 
 	~Consul();
 
-    std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) override;
+    std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) const override;
 
 };
 

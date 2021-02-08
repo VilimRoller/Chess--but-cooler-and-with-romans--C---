@@ -2,7 +2,6 @@
 #include "Consul.h"
 #include "TestFunctions.h"
 
-
 class ConsulFigure : public ::testing::Test {
 protected:
 	void SetUp() override {

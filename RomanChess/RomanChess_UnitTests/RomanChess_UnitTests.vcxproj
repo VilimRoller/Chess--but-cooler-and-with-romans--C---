@@ -152,6 +152,7 @@
     <ClCompile Include="HastatusTest.cpp" />
     <ClCompile Include="PontifexMaximusTest.cpp" />
     <ClCompile Include="PrincepsTest.cpp" />
+    <ClCompile Include="RomanChessAITestcpp.cpp" />
     <ClCompile Include="RomanChess_UnitTests.cpp" />
     <ClCompile Include="TriariusTest.cpp" />
     <ClCompile Include="VelesTest.cpp" />

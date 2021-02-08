@@ -23,19 +23,19 @@ class Figure
 public:
 	//Getters
 
-	FigureImage GetFigureImage() const {
+	const FigureImage& GetFigureImage() const {
 		return figure_image_;
 	}
 
-	BoardCoordinates GetPosition() const {
+	const BoardCoordinates& GetPosition() const {
 		return position_;
 	}
 
-	figureType GetType() const {
+	const figureType& GetType() const {
 		return figure_image_.first;
 	}
 
-	figureColour GetFigureColour() const {
+	const figureColour& GetFigureColour() const {
 		return figure_image_.second;
 	}
 
@@ -43,7 +43,7 @@ public:
 		return figure_sprite_;
 	}
 
-	auto GetEnemyColourLambda() {
+	auto GetEnemyColourLambda() const{
 		return IsFigureRed() ? IsPlacePurpleLambda : IsPlaceRedLambda;
 	}
 
@@ -79,7 +79,7 @@ public:
 								 {return IsPlacePurple(board_layout, position); };
 	}
 
-	FigureImage GetEmptyFigure() const {
+	const FigureImage GetEmptyFigure() const {
 		return FigureImage(figureType::no_type, figureColour::no_colour);
 	}
 
@@ -178,21 +178,21 @@ public:
 
 	//Methods for checking tiles around the figure
 	//Surrounding is analyzed from figure's point of view
-	bool IsPlaceEmpty(const BoardImage& board_layout, const BoardCoordinates& position) {
+	bool IsPlaceEmpty(const BoardImage& board_layout, const BoardCoordinates& position) const {
 		if (IsStillOnBoard(position)) {
 			return IsEmpty(board_layout[position.y][position.x]);
 		}
 		return false;
 	}
 
-	bool IsPlaceRed(const BoardImage& board_layout, const BoardCoordinates& position) {
+	bool IsPlaceRed(const BoardImage& board_layout, const BoardCoordinates& position) const {
 		if (IsStillOnBoard(position)) {
 			return IsRed(board_layout[position.y][position.x]);
 		}
 		return false;
 	}
 
-	bool IsPlacePurple(const BoardImage& board_layout, const BoardCoordinates& position) {
+	bool IsPlacePurple(const BoardImage& board_layout, const BoardCoordinates& position) const {
 		if (IsStillOnBoard(position)) {
 			return IsPurple(board_layout[position.y][position.x]);
 		}
@@ -200,7 +200,7 @@ public:
 	}
 
 
-	const BoardCoordinates MoveFront(const int number_of_spaces = 1) const {
+	 const BoardCoordinates MoveFront(const int number_of_spaces = 1) const {
 		return position_ + (IsFigureRed()?	BoardCoordinates(0, -number_of_spaces) :
 											BoardCoordinates(0, number_of_spaces));
 	}
@@ -245,7 +245,7 @@ public:
 	bool ValidateMove(const BoardImage& board_layout,
 		std::vector<BoardCoordinates>& res,
 		const BoardCoordinates& position,
-		T&& ConditionLambda) {
+		T&& ConditionLambda) const {
 		if (ConditionLambda(board_layout, position)) {
 			res.emplace_back(position);
 			return true;
@@ -257,7 +257,7 @@ public:
 	template <class T1>
 	void ValidateMoveInDirection(const BoardImage& board_layout,
 		std::vector<BoardCoordinates>& res,
-		T1&& DirectionLambda) {
+		T1&& DirectionLambda) const{
 		for (int num_of_spaces = 1; IsStillOnBoard(DirectionLambda(num_of_spaces)); ++num_of_spaces) {
 			if (!ValidateMove(board_layout, res, DirectionLambda(num_of_spaces), IsPlaceEmptyLambda)) {
 				ValidateMove(board_layout, res, DirectionLambda(num_of_spaces), GetEnemyColourLambda());
@@ -267,7 +267,7 @@ public:
 	}
 
 	//Specific for every figure
-	virtual std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) = 0;
+	virtual std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) const = 0;
 	
 	
 	ConditionLambdaType IsPlaceEmptyLambda;

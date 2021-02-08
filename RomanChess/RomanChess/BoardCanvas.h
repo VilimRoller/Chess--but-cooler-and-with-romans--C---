@@ -33,17 +33,17 @@ public:
     void SetFigure(const FigureImage& figure, const BoardCoordinates& position);
     void MakeFigureSprite(const BoardCoordinates& position);
 
-    void DrawRedRectangles();
-    void DrawYellowRectangles();
-    void DrawRectangles();
-    void DrawAllFigures();
-    void DrawBoard();
-
+    void DrawSprites();
     void ClearCanvas();
 
-    void DrawSprites();
-    void HandleCanvasEvent();
+    void DrawRectangles();
+    void DrawYellowRectangles();
+    void DrawRedRectangles();
     
+    void DrawAllFigures();
+    void DrawBoard();
+    
+    void HandleCanvasEvent();
     void HandleMouseButtonPressedEvent(sf::Event& mouse_event);
     void HandleMouseButtonReleasedEvent(sf::Event& mouse_event);
     void HandleMouseMovedEvent(sf::Event& mouse_event);
@@ -64,54 +64,70 @@ public:
     void ClearRectangleVectors();
 
     bool IsOnCanvas(const int x_coordinate, const int y_coordinate) const;
-    bool IsOnCanvas(sf::Vector2f coordinates);
+    bool IsOnCanvas(sf::Vector2f coordinates) const;
 
     void MoveEventSprite(const sf::Vector2f& mouse_position);
+    const sf::Vector2f GetEventSpritePosition() const;
+    const sf::Vector2f GetEventSpriteOffset() const;
 
     void SetEventFigurePosition(sf::Event& mouse_event);
-    void SetBoardImage(BoardImage new_image = Constants::initialBoardImage);
 
     void MoveEventFigure(const int x_coordinate, const int y_coordinate);
 
-    bool IsEventFigure(const int x_coordinate, const int y_coordinate) const;
-    bool IsEventMoveLegal(const int x_coordinate, const int y_coordinate) const;
-    bool IsEventMovable(const int x_coordinate, const int y_coordinate) const;
-    bool IsEventFigureRightColour() const;
-
     void SetFigurePtr(const int x_coordinate, const int y_coordinate);
+	void ResetOldEventFigurePosition();
+	void RefreshEventFigureSpritePosition();
 
-    void ResetOldEventFigurePosition();
-    void RefreshEventFigureSpritePosition();
+	void SetEventFigureCoordinates(const int x_coordinate, const int y_coordinate);
+	sf::Vector2f GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const;
+	std::pair<int, int> GetMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
+	std::pair<int, int> GetOffsettedMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
 
-    void SetEventFigurePosition(const int x_coordinate, const int y_coordinate);
-
-    bool IsFigureOnTile(const std::shared_ptr<Figure>& figure_ptr) const;
-
-    sf::Vector2f GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const;
-    std::pair<int, int> GetMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
-    std::pair<int, int> GetOffsettedMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
-
+    const BoardImage MakeBoardImage(const RomanChessFigures& figures) const;
+    void SetBoardImage(BoardImage new_image = Constants::initialBoardImage);
     void RefreshBoardImage();
 
-    BoardImage MakeBoardImage(const RomanChessFigures& figures);
-    figureColour GetPlayerTurnColour() const;
+    void SaveBoardImageToDeque();
+    bool IsDequeOverflowed() const;
+
+    void NextPlayerTurn();
+
+
+
     void CheckGameOver();
     void SetGameOver();
-    void NextPlayerTurn();
     bool IsGameOver() const;
-    std::pair<int, int> GetNumberOfConsuls();
-    void AddNumberOfConsuls(const std::shared_ptr<Figure>& figure , std::pair<int, int>& consul_number);
-
-    bool BothSidesHaveConsul(const std::pair<int, int>& consuls);
     void DisplayGameOverMessageBox();
-    void SaveBoardImage();
+
+    std::pair<int, int> GetNumberOfConsuls();
+	void AddNumberOfConsuls(const std::shared_ptr<Figure>& figure, std::pair<int, int>& consul_number);
+    bool BothSidesHaveConsul(const std::pair<int, int>& consuls) const;
+
+    
+
+
+
+
+
+    
+    
+   
+    
+    
     void ClearBoardImageDeque();
     void RemovePontifexMaximus(const figureColour& figure_colour);
     void RemoveIfPontifexMaximus(const figureColour& figure_colour, std::shared_ptr<Figure>& figure);
     void RemoveFigure(std::shared_ptr<Figure>& figure);
     bool CheckIfPontifexMaximus(std::shared_ptr<Figure>& figure);
-    void RewindBoard(const figureColour& pontifex_colour);
+    void RewindBoard(const figureColour pontifex_colour);
     
+	bool IsFigureOnTile(const std::shared_ptr<Figure>& figure_ptr) const;
+	bool IsEventFigure(const int x_coordinate, const int y_coordinate) const;
+	bool IsEventMoveLegal(const int x_coordinate, const int y_coordinate) const;
+	bool IsEventMovable(const int x_coordinate, const int y_coordinate) const;
+	bool IsEventFigureRightColour() const;
+
+    const figureColour& GetPlayerTurnColour() const;
 
 protected:
     void OnUpdate() override;
@@ -128,6 +144,7 @@ private:
     bool is_dragging_enabled_ = false;
     bool is_drawing_rectangles_enabled_ = false;
 
+    int move_counter_ = 0;
     std::vector<BoardCoordinates> yellow_rectangle_positions_;
     std::vector<BoardCoordinates> red_rectangle_positions_;
 

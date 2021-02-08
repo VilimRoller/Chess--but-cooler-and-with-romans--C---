@@ -8,7 +8,6 @@ RomanChessAI::RomanChessAI(const AIType& AI_type_red, const AIStrategy& AI_strat
 	AI_type_purple_{ AI_type_purple }, AI_strategy_purple_{ AI_strategy_purple },
 	game_figures_{ &game_figures }, AI_player_colour_{ AI_colour }{
 	InitializeRomanChessAI();
-
 }
 
 void RomanChessAI::InitializeRomanChessAI() {
@@ -74,39 +73,61 @@ void RomanChessAI::SetFigureEvaluationMultiplierMap(const std::map<figureType, I
 	}
 }
 
-BoardImage RomanChessAI::GetBoardImage(const RomanChessFigures& figures) {
+const BoardImage RomanChessAI::GetBoardImage() const {
 	BoardImage result;
 	for (int row = 0; row < Constants::boardSize;++row) {
 		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
-			if (IsFigureOnTile(figures[row][collumn])) {
-				result[row][collumn] = figures[row][collumn]->GetFigureImage();
+			if (IsFigureOnTile((*game_figures_)[row][collumn])) {
+				result[row][collumn] = (*game_figures_)[row][collumn]->GetFigureImage();
 			}
 		}
 	}
 	return result;
 }
 
-bool RomanChessAI::IsFigureOnTile(std::shared_ptr<Figure> tile) {
+inline void RomanChessAI::RefreshCurrentBoardImage() {
+	current_board_image_ = GetBoardImage();
+}
+
+const BoardImage& RomanChessAI::GetCurrentBoardImage() const {
+	return current_board_image_;
+}
+
+inline bool RomanChessAI::IsFigureOnTile(std::shared_ptr<Figure> tile) const {
 	return tile != nullptr;
 }
 
-inline bool RomanChessAI::IsFigureImageEmpty(const FigureImage& figure_image) {
+inline bool RomanChessAI::IsFigureImageEmpty(const FigureImage& figure_image) const {
 	return figure_image == FigureImage(figureType::no_type, figureColour::no_colour);
 }
 
-int RomanChessAI::GetEvaluatedBoardStrenght(const BoardImage& board) {
+const int RomanChessAI::GetEvaluatedBoardStrenght() {
 	int result = 0;
 	for (int row = 0; row < Constants::boardSize; ++row) {
 		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
-			if (!IsFigureImageEmpty(board[row][collumn])) {
-				result += GetFigureStrengh(board, BoardCoordinates(collumn, row));
+			if (!IsFigureImageEmpty(current_board_image_[row][collumn])) {
+				result += GetFigureStrengh(current_board_image_[row][collumn], BoardCoordinates(collumn, row));
 			}
 		}
 	}
 	return result;
 }
 
-int RomanChessAI::GetFigureStrengh(const BoardImage& board, const BoardCoordinates& coordinates) {
+inline const int RomanChessAI::GetFigureStrengh(const FigureImage& figure_image, const BoardCoordinates& coordinates) {
+	auto figure_type = figure_image.first;
+	auto figure_colour = figure_image.second;
+	auto evaluation_value = figure_evaluation_values_map_red_[figure_image];
+	auto evaluation_multiplier = GetFigureEvaluationMultiplier(figure_type, figure_colour, coordinates);
 
-	return 0;
+	return evaluation_value * evaluation_multiplier;
+}
+
+inline int RomanChessAI::GetFigureEvaluationMultiplier(const figureType& figure_type, const figureColour& figure_colour, const BoardCoordinates& coordinates) {
+	switch (figure_colour) {
+	case figureColour::Red:
+		return figure_evaluation_multplier_map_red_[figure_type][coordinates.y][coordinates.x];
+		break;
+	case figureColour::Purple:
+		return figure_evaluation_multplier_map_purple_[figure_type][Constants::lastBoardElement - coordinates.y][Constants::lastBoardElement - coordinates.x];
+	}
 }

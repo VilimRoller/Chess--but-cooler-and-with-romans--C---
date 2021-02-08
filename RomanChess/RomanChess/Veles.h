@@ -11,7 +11,7 @@ public:
 	
 	~Veles();
 
-	std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) override;
+	std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) const override;
 
 
 	//Illegal moves for this figure

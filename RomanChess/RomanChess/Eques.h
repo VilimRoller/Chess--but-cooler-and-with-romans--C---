@@ -12,12 +12,12 @@ public:
 	~Eques();
 
 
-	std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) override;
+	std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) const override;
 
 	template <class T1>
 	void ValidateEquesMove(const BoardImage& board_layout,
 		std::vector<BoardCoordinates>& res,
-		T1&& DirectionLambda) {
+		T1&& DirectionLambda) const {
 
 		BoardCoordinates evaluated_position = DirectionLambda(2);
 		if (GetPosition().x == evaluated_position.x) { //moving vertically 
@@ -34,6 +34,7 @@ public:
 		}
 	}
 
+	//Not used by this figure
 	const BoardCoordinates MoveDiagonalLeftFront(const int number_of_spaces = 1) const = delete;
 	const BoardCoordinates MoveDiagonalLeftBack(const int number_of_spaces = 1) const = delete;
 	const BoardCoordinates MoveDiagonalRightFront(const int number_of_spaces = 1) const = delete;
