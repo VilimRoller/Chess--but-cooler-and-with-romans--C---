@@ -35,6 +35,7 @@
     <ClInclude Include="Princeps.h" />
     <ClInclude Include="RomanChessAI.h" />
     <ClInclude Include="RomanChessGame.h" />
+    <ClInclude Include="RomanChessNode.h" />
     <ClInclude Include="Triarius.h" />
     <ClInclude Include="Veles.h" />
     <ClInclude Include="wxConstants.h" />

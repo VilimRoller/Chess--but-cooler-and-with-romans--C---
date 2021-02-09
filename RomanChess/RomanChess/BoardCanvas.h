@@ -92,8 +92,6 @@ public:
 
     void NextPlayerTurn();
 
-
-
     void CheckGameOver();
     void SetGameOver();
     bool IsGameOver() const;
@@ -103,22 +101,11 @@ public:
 	void AddNumberOfConsuls(const std::shared_ptr<Figure>& figure, std::pair<int, int>& consul_number);
     bool BothSidesHaveConsul(const std::pair<int, int>& consuls) const;
 
-    
-
-
-
-
-
-    
-    
-   
-    
-    
     void ClearBoardImageDeque();
     void RemovePontifexMaximus(const figureColour& figure_colour);
     void RemoveIfPontifexMaximus(const figureColour& figure_colour, std::shared_ptr<Figure>& figure);
     void RemoveFigure(std::shared_ptr<Figure>& figure);
-    bool CheckIfPontifexMaximus(std::shared_ptr<Figure>& figure);
+    bool CheckIfPontifexMaximus(const std::shared_ptr<Figure>& figure);
     void RewindBoard(const figureColour pontifex_colour);
     
 	bool IsFigureOnTile(const std::shared_ptr<Figure>& figure_ptr) const;

@@ -434,7 +434,7 @@ inline void BoardCanvas::ClearBoardImageDeque() {
 	board_image_deque_.clear();
 }
 
-bool BoardCanvas::CheckIfPontifexMaximus(std::shared_ptr<Figure>& figure) {
+bool BoardCanvas::CheckIfPontifexMaximus(const std::shared_ptr<Figure>& figure) {
 	if (IsFigureOnTile(figure)) {
 		if (figure->IsFigureType(figureType::PontifexMaximus)) {
 			RewindBoard(figure->GetFigureColour());

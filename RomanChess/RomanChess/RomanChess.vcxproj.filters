@@ -90,6 +90,9 @@
     <ClInclude Include="RomanChessAI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RomanChessNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChessApp.cpp">
