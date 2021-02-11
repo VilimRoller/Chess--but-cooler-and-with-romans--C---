@@ -42,6 +42,11 @@ protected:
 		TestFunctions::MakeMultipleFigureImages(purple_princeps_figure, purple_figure_coordinates, board_figures);
 		TestFunctions::SetMultipleFigureImages(test_board1, board_figures);
 
+		for (int i = 0; i < red_figure_coordinates.size(); ++i) {
+			red_princeps_figures1[i].CalculateLegalMoves(test_board1);
+			purple_princeps_figures1[i].CalculateLegalMoves(test_board1);
+		}
+
 		board_figures.clear();
 		red_figure_coordinates.clear();
 		purple_figure_coordinates.clear();
@@ -82,6 +87,10 @@ protected:
 		TestFunctions::MakeMultipleFigureImages(purple_princeps_figure, purple_figure_coordinates, board_figures);
 		TestFunctions::SetMultipleFigureImages(test_board2, board_figures);
 
+		for (int i = 0; i < red_figure_coordinates.size(); ++i) {
+			red_princeps_figures2[i].CalculateLegalMoves(test_board2);
+			purple_princeps_figures2[i].CalculateLegalMoves(test_board2);
+		}
 	}
 	void TearDown() override {}
 	BoardImage test_board1; // testing moving out of map and left and right movement
@@ -94,15 +103,15 @@ protected:
 };
 
 TEST_F(PrincepsFigure, NumberOfLegalMoves_Red) {
-	EXPECT_EQ(red_princeps_figures2[4].GetLegalMoves(test_board2).size(), 15);
-	EXPECT_EQ(red_princeps_figures2[5].GetLegalMoves(test_board2).size(), 5);
-	EXPECT_EQ(red_princeps_figures2[6].GetLegalMoves(test_board2).size(), 9);
+	EXPECT_EQ(red_princeps_figures2[4].GetLegalMoves().size(), 15);
+	EXPECT_EQ(red_princeps_figures2[5].GetLegalMoves().size(), 5);
+	EXPECT_EQ(red_princeps_figures2[6].GetLegalMoves().size(), 9);
 }
 
 TEST_F(PrincepsFigure, NumberOfLegalMoves_Purple) {
-	EXPECT_EQ(purple_princeps_figures2[4].GetLegalMoves(test_board2).size(), 5);
-	EXPECT_EQ(purple_princeps_figures2[5].GetLegalMoves(test_board2).size(), 15);
-	EXPECT_EQ(purple_princeps_figures2[6].GetLegalMoves(test_board2).size(), 11);
+	EXPECT_EQ(purple_princeps_figures2[4].GetLegalMoves().size(), 5);
+	EXPECT_EQ(purple_princeps_figures2[5].GetLegalMoves().size(), 15);
+	EXPECT_EQ(purple_princeps_figures2[6].GetLegalMoves().size(), 11);
 }
 
 //------------------------------------------------------------------------------------------------------------------------\\

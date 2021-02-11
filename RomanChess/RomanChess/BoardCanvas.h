@@ -30,8 +30,9 @@ public:
     void SetRectangleSpritePosition(const int row, const int collumn);
 
     void InitializeRomanChessFigures(const BoardImage& board_image);
-    void SetFigure(const FigureImage& figure, const BoardCoordinates& position);
-    void MakeFigureSprite(const BoardCoordinates& position);
+    void SetFigure(const BoardImage& board, const BoardCoordinates& position);
+    void MakeFigureSprite(const std::shared_ptr<Figure>& figure);
+    void InitializeLegalMoves(const std::shared_ptr<Figure>& figure, const BoardImage& board);
 
     void DrawSprites();
     void ClearCanvas();
@@ -54,6 +55,7 @@ public:
     void DisableDrawingRectangles();
 
     void SetEventFigureSpritePtr(sf::Event& mouse_event);
+
     void SetEventFigurePtr(const int x_coordinate, const int y_coordinate);
     void ResetEventFigurePtr();
     void SetEventFigureOffset(const sf::Vector2f& mouse_vector_coordinates);
@@ -76,9 +78,10 @@ public:
 
     void SetFigurePtr(const int x_coordinate, const int y_coordinate);
 	void ResetOldEventFigurePosition();
+    void SetEventFigureCoordinates(const int x_coordinate, const int y_coordinate);
 	void RefreshEventFigureSpritePosition();
+    void RefreshEventFigureLegalMoves();
 
-	void SetEventFigureCoordinates(const int x_coordinate, const int y_coordinate);
 	sf::Vector2f GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const;
 	std::pair<int, int> GetMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
 	std::pair<int, int> GetOffsettedMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
@@ -146,7 +149,6 @@ private:
     std::array<std::array<sf::Sprite, Constants::boardSize>, Constants::boardSize> red_rectangles_;
 
     RomanChessFigures figures_;
-
     BoardImage board_image_;
 
 	bool is_game_over_ = false;

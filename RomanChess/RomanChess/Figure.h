@@ -129,7 +129,7 @@ public:
 
 	void SetFigureSpritePosition() {
 		figure_sprite_.setPosition(static_cast<float>(GetPosition().x * Constants::PixelMultiplier),
-									static_cast<float>(GetPosition().y * Constants::PixelMultiplier));
+								   static_cast<float>(GetPosition().y * Constants::PixelMultiplier));
 	}
 
 	void SetTextureRect(const std::pair<sf::Vector2i, sf::Vector2i>& figure_sprite_rect_pos) {
@@ -170,9 +170,8 @@ public:
 	}
 
 	bool IsMoveLegal(const BoardCoordinates& new_position, const BoardImage& board_layout) {
-		std::vector<BoardCoordinates> legal_moves = GetLegalMoves(board_layout);
-		return std::any_of(legal_moves.begin(),
-						   legal_moves.end(),
+		return std::any_of(legal_moves_.begin(),
+						   legal_moves_.end(),
 						   [&new_position](const auto& legal_move) {return new_position == legal_move; });
 	}
 
@@ -240,45 +239,58 @@ public:
 											BoardCoordinates(-number_of_spaces, -number_of_spaces));
 	}
 
+	std::vector<BoardCoordinates> GetLegalMoves() const{
+		return legal_moves_;
+	}
+
+	void ClearLegalMoves() {
+		legal_moves_.clear();
+	}
+
+	void AddLegalMove(const BoardCoordinates& move_coordinate) {
+		legal_moves_.emplace_back(move_coordinate);
+	}
+
+	void RefreshLegalMoves(const BoardImage& board_layout) {
+		ClearLegalMoves();
+		CalculateLegalMoves(board_layout);
+	}
+
 	//Validate figure's move to position
-	template <class T>
+	template <class LAMBDA>
 	bool ValidateMove(const BoardImage& board_layout,
-		std::vector<BoardCoordinates>& res,
 		const BoardCoordinates& position,
-		T&& ConditionLambda) const {
+		LAMBDA&& ConditionLambda) {
 		if (ConditionLambda(board_layout, position)) {
-			res.emplace_back(position);
+			AddLegalMove(position);
 			return true;
 		}
 		return false;
 	}
 
 	//Validate figure's moves in direction defined by DirectionLambda
-	template <class T1>
+	template <class LAMBDA>
 	void ValidateMoveInDirection(const BoardImage& board_layout,
-		std::vector<BoardCoordinates>& res,
-		T1&& DirectionLambda) const{
+		LAMBDA&& DirectionLambda){
 		for (int num_of_spaces = 1; IsStillOnBoard(DirectionLambda(num_of_spaces)); ++num_of_spaces) {
-			if (!ValidateMove(board_layout, res, DirectionLambda(num_of_spaces), IsPlaceEmptyLambda)) {
-				ValidateMove(board_layout, res, DirectionLambda(num_of_spaces), GetEnemyColourLambda());
+			if (!ValidateMove(board_layout, DirectionLambda(num_of_spaces), IsPlaceEmptyLambda)) {
+				ValidateMove(board_layout, DirectionLambda(num_of_spaces), GetEnemyColourLambda());
 				break; //Avoid skipping over figures
 			}
 		}
 	}
 
 	//Specific for every figure
-	virtual std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) const = 0;
-	
+	virtual void CalculateLegalMoves(const BoardImage& board_layout) = 0;
 	
 	ConditionLambdaType IsPlaceEmptyLambda;
 	ConditionLambdaType IsPlaceRedLambda;
 	ConditionLambdaType IsPlacePurpleLambda;
-
 
 	sf::Sprite figure_sprite_;
 
 private:
 	BoardCoordinates position_;
 	FigureImage figure_image_;
-	
+	std::vector<BoardCoordinates> legal_moves_;
 };

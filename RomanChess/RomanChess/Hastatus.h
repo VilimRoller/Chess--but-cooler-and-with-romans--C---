@@ -11,9 +11,9 @@ public:
     
     ~Hastatus();
 
-    std::vector<BoardCoordinates> GetLegalMoves(const BoardImage& board_layout) const override;
+    void CalculateLegalMoves(const BoardImage& board_layout) override;
 
-    void CheckFront(const BoardImage& board_layout, std::vector<BoardCoordinates>& res) const;
+    void CheckFront(const BoardImage& board_layout);
 
 
     //Illegal methods for this figure

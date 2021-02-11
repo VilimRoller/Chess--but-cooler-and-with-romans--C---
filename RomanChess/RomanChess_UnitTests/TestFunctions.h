@@ -25,9 +25,9 @@ namespace TestFunctions {
 		board[coordinates.y][coordinates.x] = figure;
 	}
 
-	inline void MakeMultipleFigureImages (FigureImage image, 
-										  std::vector<BoardCoordinates> coordinates,
-										  std::vector<std::pair<FigureImage, BoardCoordinates>>& result) {
+	inline void MakeMultipleFigureImages(FigureImage image,
+		std::vector<BoardCoordinates> coordinates,
+		std::vector<std::pair<FigureImage, BoardCoordinates>>& result) {
 		for (auto& position : coordinates) {
 			result.emplace_back(std::make_pair(image, position));
 		}
@@ -38,56 +38,6 @@ namespace TestFunctions {
 			SetFigureImage(board, figure.first, figure.second);
 		}
 	}
-
-}
-
-
-/*
-#include <iostream>
-#include <chrono>
-#include <ctime>
-#include <cmath>
-
-class Timer
-{
-public:
-	void start()
-	{
-		m_StartTime = std::chrono::system_clock::now();
-		m_bRunning = true;
-	}
-
-	void stop()
-	{
-		m_EndTime = std::chrono::system_clock::now();
-		m_bRunning = false;
-	}
-
-	double elapsedMilliseconds()
-	{
-		std::chrono::time_point<std::chrono::system_clock> endTime;
-
-		if (m_bRunning)
-		{
-			endTime = std::chrono::system_clock::now();
-		}
-		else
-		{
-			endTime = m_EndTime;
-		}
-
-		return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - m_StartTime).count();
-	}
-
-	double elapsedSeconds()
-	{
-		return elapsedMilliseconds() / 1000.0;
-	}
-
-private:
-	std::chrono::time_point<std::chrono::system_clock> m_StartTime;
-	std::chrono::time_point<std::chrono::system_clock> m_EndTime;
-	bool                                               m_bRunning = false;
 };
-*/
+
 

@@ -9,27 +9,23 @@ PontifexMaximus::PontifexMaximus(figureColour figure_colour,
 PontifexMaximus::~PontifexMaximus() {
 }
 
-std::vector<BoardCoordinates> PontifexMaximus::GetLegalMoves(const BoardImage& board_layout) const{
-	std::vector<BoardCoordinates> result;
+void PontifexMaximus::CalculateLegalMoves(const BoardImage& board_layout){
+	ValidateMove(board_layout, MoveFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveFront(), GetEnemyColourLambda());
+	ValidateMove(board_layout, MoveBack(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveBack(), GetEnemyColourLambda());
+	ValidateMove(board_layout, MoveLeft(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveLeft(), GetEnemyColourLambda());
+	ValidateMove(board_layout, MoveRight(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveRight(), GetEnemyColourLambda());
 
-	ValidateMove(board_layout, result, MoveFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveFront(), GetEnemyColourLambda());
-	ValidateMove(board_layout, result, MoveBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveBack(), GetEnemyColourLambda());
-	ValidateMove(board_layout, result, MoveLeft(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveLeft(), GetEnemyColourLambda());
-	ValidateMove(board_layout, result, MoveRight(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveRight(), GetEnemyColourLambda());
-
-	ValidateMove(board_layout, result, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalLeftFront(), GetEnemyColourLambda());
-	ValidateMove(board_layout, result, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalRightFront(), GetEnemyColourLambda());
-	ValidateMove(board_layout, result, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalLeftBack(), GetEnemyColourLambda());
-	ValidateMove(board_layout, result, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalRightBack(), GetEnemyColourLambda());
-
-	return result;
+	ValidateMove(board_layout, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalLeftFront(), GetEnemyColourLambda());
+	ValidateMove(board_layout, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalRightFront(), GetEnemyColourLambda());
+	ValidateMove(board_layout, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalLeftBack(), GetEnemyColourLambda());
+	ValidateMove(board_layout, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalRightBack(), GetEnemyColourLambda());
 }
 

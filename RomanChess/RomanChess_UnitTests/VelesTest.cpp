@@ -40,6 +40,10 @@ protected:
 		TestFunctions::MakeMultipleFigureImages(purple_veles_figure, purple_figure_coordinates, board_figures);
 		TestFunctions::SetMultipleFigureImages(test_board, board_figures);
 
+		for (int i = 0; i < red_figure_coordinates.size(); ++i) {
+			red_veles_figures[i].CalculateLegalMoves(test_board);
+			purple_veles_figures[i].CalculateLegalMoves(test_board);
+		}
 	}
 	void TearDown() override {}
 	BoardImage test_board;
@@ -48,23 +52,23 @@ protected:
 };
 
 TEST_F(VelesFigure, NumberOfLegalMoves_Red) {
-	EXPECT_EQ(red_veles_figures[0].GetLegalMoves(test_board).size(), 0);
-	EXPECT_EQ(red_veles_figures[1].GetLegalMoves(test_board).size(), 0);
-	EXPECT_EQ(red_veles_figures[2].GetLegalMoves(test_board).size(), 1);
-	EXPECT_EQ(red_veles_figures[3].GetLegalMoves(test_board).size(), 2);
-	EXPECT_EQ(red_veles_figures[4].GetLegalMoves(test_board).size(), 3);
-	EXPECT_EQ(red_veles_figures[5].GetLegalMoves(test_board).size(), 0);
-	EXPECT_EQ(red_veles_figures[6].GetLegalMoves(test_board).size(), 0);
+	EXPECT_EQ(red_veles_figures[0].GetLegalMoves().size(), 0);
+	EXPECT_EQ(red_veles_figures[1].GetLegalMoves().size(), 0);
+	EXPECT_EQ(red_veles_figures[2].GetLegalMoves().size(), 1);
+	EXPECT_EQ(red_veles_figures[3].GetLegalMoves().size(), 2);
+	EXPECT_EQ(red_veles_figures[4].GetLegalMoves().size(), 3);
+	EXPECT_EQ(red_veles_figures[5].GetLegalMoves().size(), 0);
+	EXPECT_EQ(red_veles_figures[6].GetLegalMoves().size(), 0);
 }
 
 TEST_F(VelesFigure, NumberOfLegalMoves_Purple) {
-	EXPECT_EQ(purple_veles_figures[0].GetLegalMoves(test_board).size(), 0);
-	EXPECT_EQ(purple_veles_figures[1].GetLegalMoves(test_board).size(), 0);
-	EXPECT_EQ(purple_veles_figures[2].GetLegalMoves(test_board).size(), 3);
-	EXPECT_EQ(purple_veles_figures[3].GetLegalMoves(test_board).size(), 1);
-	EXPECT_EQ(purple_veles_figures[4].GetLegalMoves(test_board).size(), 2);
-	EXPECT_EQ(purple_veles_figures[5].GetLegalMoves(test_board).size(), 0);
-	EXPECT_EQ(purple_veles_figures[6].GetLegalMoves(test_board).size(), 0);
+	EXPECT_EQ(purple_veles_figures[0].GetLegalMoves().size(), 0);
+	EXPECT_EQ(purple_veles_figures[1].GetLegalMoves().size(), 0);
+	EXPECT_EQ(purple_veles_figures[2].GetLegalMoves().size(), 3);
+	EXPECT_EQ(purple_veles_figures[3].GetLegalMoves().size(), 1);
+	EXPECT_EQ(purple_veles_figures[4].GetLegalMoves().size(), 2);
+	EXPECT_EQ(purple_veles_figures[5].GetLegalMoves().size(), 0);
+	EXPECT_EQ(purple_veles_figures[6].GetLegalMoves().size(), 0);
 }
 
 

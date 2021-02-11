@@ -9,20 +9,16 @@ Hastatus::Hastatus(figureColour figure_colour,
 Hastatus::~Hastatus() {
 }
 
-std::vector<BoardCoordinates> Hastatus::GetLegalMoves(const BoardImage& board_layout) const {
-	std::vector<BoardCoordinates> result;
-
-	CheckFront(board_layout, result);
-	ValidateMove(board_layout, result, MoveBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalLeftFront(), GetEnemyColourLambda());
-	ValidateMove(board_layout, result, MoveDiagonalRightFront(), GetEnemyColourLambda());
-
-	return result;
+void Hastatus::CalculateLegalMoves(const BoardImage& board_layout) {
+	CheckFront(board_layout);
+	ValidateMove(board_layout, MoveBack(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalLeftFront(), GetEnemyColourLambda());
+	ValidateMove(board_layout, MoveDiagonalRightFront(), GetEnemyColourLambda());
 }
 
-void Hastatus::CheckFront(const BoardImage& board_layout, std::vector<BoardCoordinates>& res) const {
+void Hastatus::CheckFront(const BoardImage& board_layout) {
 	for (int num_of_moves = 1; num_of_moves < 3; ++num_of_moves) {
-		if (!ValidateMove(board_layout, res, MoveFront(num_of_moves), IsPlaceEmptyLambda)) {
+		if (!ValidateMove(board_layout, MoveFront(num_of_moves), IsPlaceEmptyLambda)) {
 			break;
 		}
 	}

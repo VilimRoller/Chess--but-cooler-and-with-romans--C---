@@ -40,6 +40,11 @@ protected:
 		TestFunctions::MakeMultipleFigureImages(red_pontifex_maximus_figure, red_figure_coordinates, board_figures);
 		TestFunctions::MakeMultipleFigureImages(purple_pontifex_maximus_figure, purple_figure_coordinates, board_figures);
 		TestFunctions::SetMultipleFigureImages(test_board, board_figures);
+
+		for (int i = 0; i < red_figure_coordinates.size(); ++i) {
+			red_pontifex_maximus_figures[i].CalculateLegalMoves(test_board);
+			purple_pontifex_maximus_figures[i].CalculateLegalMoves(test_board);
+		}
 	}
 	void TearDown() override {}
 	BoardImage test_board;
@@ -49,23 +54,21 @@ protected:
 };
 
 TEST_F(PontifexMaximusFigure, GetLegalMoves_Red) {
-	EXPECT_EQ(red_pontifex_maximus_figures[0].GetLegalMoves(test_board).size(), 6);
-	EXPECT_EQ(red_pontifex_maximus_figures[1].GetLegalMoves(test_board).size(), 6);
-	EXPECT_EQ(red_pontifex_maximus_figures[2].GetLegalMoves(test_board).size(), 5);
-	EXPECT_EQ(red_pontifex_maximus_figures[3].GetLegalMoves(test_board).size(), 3);
-	EXPECT_EQ(red_pontifex_maximus_figures[4].GetLegalMoves(test_board).size(), 4);
-	EXPECT_EQ(red_pontifex_maximus_figures[5].GetLegalMoves(test_board).size(), 8);
-	EXPECT_EQ(red_pontifex_maximus_figures[6].GetLegalMoves(test_board).size(), 3);
+	EXPECT_EQ(red_pontifex_maximus_figures[0].GetLegalMoves().size(), 6);
+	EXPECT_EQ(red_pontifex_maximus_figures[1].GetLegalMoves().size(), 6);
+	EXPECT_EQ(red_pontifex_maximus_figures[2].GetLegalMoves().size(), 5);
+	EXPECT_EQ(red_pontifex_maximus_figures[3].GetLegalMoves().size(), 3);
+	EXPECT_EQ(red_pontifex_maximus_figures[4].GetLegalMoves().size(), 4);
+	EXPECT_EQ(red_pontifex_maximus_figures[5].GetLegalMoves().size(), 8);
+	EXPECT_EQ(red_pontifex_maximus_figures[6].GetLegalMoves().size(), 3);
 }
 
-
 TEST_F(PontifexMaximusFigure, GetLegalMoves_Purple) {
-	EXPECT_EQ(purple_pontifex_maximus_figures[0].GetLegalMoves(test_board).size(), 8);
-	EXPECT_EQ(purple_pontifex_maximus_figures[1].GetLegalMoves(test_board).size(), 7);
-	EXPECT_EQ(purple_pontifex_maximus_figures[2].GetLegalMoves(test_board).size(), 4);
-	EXPECT_EQ(purple_pontifex_maximus_figures[3].GetLegalMoves(test_board).size(), 7);
-	EXPECT_EQ(purple_pontifex_maximus_figures[4].GetLegalMoves(test_board).size(), 7);
-	EXPECT_EQ(purple_pontifex_maximus_figures[5].GetLegalMoves(test_board).size(), 5);
-	EXPECT_EQ(purple_pontifex_maximus_figures[6].GetLegalMoves(test_board).size(), 7);
-
+	EXPECT_EQ(purple_pontifex_maximus_figures[0].GetLegalMoves().size(), 8);
+	EXPECT_EQ(purple_pontifex_maximus_figures[1].GetLegalMoves().size(), 7);
+	EXPECT_EQ(purple_pontifex_maximus_figures[2].GetLegalMoves().size(), 4);
+	EXPECT_EQ(purple_pontifex_maximus_figures[3].GetLegalMoves().size(), 7);
+	EXPECT_EQ(purple_pontifex_maximus_figures[4].GetLegalMoves().size(), 7);
+	EXPECT_EQ(purple_pontifex_maximus_figures[5].GetLegalMoves().size(), 5);
+	EXPECT_EQ(purple_pontifex_maximus_figures[6].GetLegalMoves().size(), 7);
 }

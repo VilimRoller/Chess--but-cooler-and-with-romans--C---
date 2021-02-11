@@ -42,6 +42,11 @@ protected:
 		TestFunctions::MakeMultipleFigureImages(purple_triarius_figure, purple_figure_coordinates, board_figures);
 		TestFunctions::SetMultipleFigureImages(test_board1, board_figures);
 
+		for (int i = 0; i < red_figure_coordinates.size(); ++i) {
+			red_triarius_figures1[i].CalculateLegalMoves(test_board1);
+			purple_triarius_figures1[i].CalculateLegalMoves(test_board1);
+		}
+
 		board_figures.clear();
 		red_figure_coordinates.clear();
 		purple_figure_coordinates.clear();
@@ -82,6 +87,13 @@ protected:
 		TestFunctions::MakeMultipleFigureImages(purple_triarius_figure, purple_figure_coordinates, board_figures);
 		TestFunctions::SetMultipleFigureImages(test_board2, board_figures);
 
+		for (int i = 0; i < red_figure_coordinates.size(); ++i) {
+			red_triarius_figures2[i].CalculateLegalMoves(test_board2);
+		}
+
+		for (int i = 0; i < purple_figure_coordinates.size(); ++i) {
+			purple_triarius_figures2[i].CalculateLegalMoves(test_board2);
+		}
 	}
 
 	void TearDown() override {}
@@ -95,17 +107,17 @@ protected:
 };
 
 TEST_F(TriariusFigure, NumberOfLegalMoves_Red) {
-	EXPECT_EQ(red_triarius_figures2[0].GetLegalMoves(test_board2).size(), 12);
-	EXPECT_EQ(red_triarius_figures2[3].GetLegalMoves(test_board2).size(), 10);
-	EXPECT_EQ(red_triarius_figures2[5].GetLegalMoves(test_board2).size(), 6);
-	EXPECT_EQ(red_triarius_figures2[9].GetLegalMoves(test_board2).size(), 5);
+	EXPECT_EQ(red_triarius_figures2[0].GetLegalMoves().size(), 12);
+	EXPECT_EQ(red_triarius_figures2[3].GetLegalMoves().size(), 10);
+	EXPECT_EQ(red_triarius_figures2[5].GetLegalMoves().size(), 6);
+	EXPECT_EQ(red_triarius_figures2[9].GetLegalMoves().size(), 5);
 }
 
 TEST_F(TriariusFigure, NumberOfLegalMoves_Purple) {
-	EXPECT_EQ(purple_triarius_figures2[0].GetLegalMoves(test_board2).size(), 9);
-	EXPECT_EQ(purple_triarius_figures2[1].GetLegalMoves(test_board2).size(), 6);
-	EXPECT_EQ(purple_triarius_figures2[2].GetLegalMoves(test_board2).size(), 9);
-	EXPECT_EQ(purple_triarius_figures2[3].GetLegalMoves(test_board2).size(), 5);
+	EXPECT_EQ(purple_triarius_figures2[0].GetLegalMoves().size(), 9);
+	EXPECT_EQ(purple_triarius_figures2[1].GetLegalMoves().size(), 6);
+	EXPECT_EQ(purple_triarius_figures2[2].GetLegalMoves().size(), 9);
+	EXPECT_EQ(purple_triarius_figures2[3].GetLegalMoves().size(), 5);
 }
 
 
@@ -113,43 +125,43 @@ TEST_F(TriariusFigure, NumberOfLegalMoves_Purple) {
 //MOVING FRONT
 //------------------------------------------------------------------------------------------------------------------------\\
 
-TEST_F(TriariusFigure, MoveFront_OutOfBoard_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_OutOfBoard_Red) {
 	EXPECT_FALSE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveFront(2), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveFront_OutOfBoard_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_OutOfBoard_Purple) {
 	EXPECT_FALSE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveFront(2), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveFront_Empty_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_Empty_Red) {
 	EXPECT_TRUE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveFront(1), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveFront_Empty_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_Empty_Purple) {
 	EXPECT_TRUE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveFront(1), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveFront_Enemy_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_Enemy_Red) {
 	EXPECT_TRUE(red_triarius_figures2[3].IsMoveLegal(red_triarius_figures2[3].MoveFront(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveFront_Enemy_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_Enemy_Purple) {
 	EXPECT_TRUE(purple_triarius_figures2[1].IsMoveLegal(purple_triarius_figures2[1].MoveFront(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveFront_Ally_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_Ally_Red) {
 	EXPECT_FALSE(red_triarius_figures2[5].IsMoveLegal(red_triarius_figures2[2].MoveFront(3), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveFront_Ally_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_Ally_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[0].IsMoveLegal(purple_triarius_figures2[0].MoveFront(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveFront_SkipOverFigures_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_SkipOverFigures_Red) {
 	EXPECT_FALSE(red_triarius_figures2[3].IsMoveLegal(red_triarius_figures2[3].MoveFront(3), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveFront_SkipOverFigures_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveFront_SkipOverFigures_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[1].IsMoveLegal(purple_triarius_figures2[1].MoveFront(3), test_board2));
 }
 
@@ -159,43 +171,43 @@ TEST_F(TriariusFigure, MoveFront_SkipOverFigures_Purple) {
 //MOVING BACK
 //------------------------------------------------------------------------------------------------------------------------\\
 
-TEST_F(TriariusFigure, MoveBack_OutOfBoard_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_OutOfBoard_Red) {
 	EXPECT_FALSE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveBack(7), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveBack_OutOfBoard_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_OutOfBoard_Purple) {
 	EXPECT_FALSE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveBack(7), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveBack_Empty_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_Empty_Red) {
 	EXPECT_TRUE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveBack(6), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveBack_Empty_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_Empty_Purple) {
 	EXPECT_TRUE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveBack(6), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveBack_Enemy_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_Enemy_Red) {
 	EXPECT_TRUE(red_triarius_figures2[7].IsMoveLegal(red_triarius_figures2[7].MoveBack(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveBack_Enemy_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_Enemy_Purple) {
 	EXPECT_TRUE(purple_triarius_figures2[2].IsMoveLegal(purple_triarius_figures2[2].MoveBack(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveBack_Ally_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_Ally_Red) {
 	EXPECT_FALSE(red_triarius_figures2[5].IsMoveLegal(red_triarius_figures2[1].MoveBack(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveBack_Ally_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_Ally_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[1].IsMoveLegal(purple_triarius_figures2[1].MoveBack(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveBack_SkipOverFigures_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_SkipOverFigures_Red) {
 	EXPECT_FALSE(red_triarius_figures2[1].IsMoveLegal(red_triarius_figures2[1].MoveBack(3), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveBack_SkipOverFigures_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveBack_SkipOverFigures_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[1].IsMoveLegal(purple_triarius_figures2[1].MoveBack(3), test_board2));
 }
 
@@ -204,43 +216,43 @@ TEST_F(TriariusFigure, MoveBack_SkipOverFigures_Purple) {
 //MOVING LEFT
 //------------------------------------------------------------------------------------------------------------------------\\
 
-TEST_F(TriariusFigure, MoveLeft_OutOfBoard_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_OutOfBoard_Red) {
 	EXPECT_FALSE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveLeft(2), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveLeft_OutOfBoard_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_OutOfBoard_Purple) {
 	EXPECT_FALSE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveLeft(2), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveLeft_Empty_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_Empty_Red) {
 	EXPECT_TRUE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveLeft(1), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveLeft_Empty_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_Empty_Purple) {
 	EXPECT_TRUE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveLeft(1), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveLeft_Enemy_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_Enemy_Red) {
 	EXPECT_TRUE(red_triarius_figures2[8].IsMoveLegal(red_triarius_figures2[8].MoveLeft(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveLeft_Enemy_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_Enemy_Purple) {
 	EXPECT_TRUE(purple_triarius_figures2[2].IsMoveLegal(purple_triarius_figures2[2].MoveLeft(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveLeft_Ally_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_Ally_Red) {
 	EXPECT_FALSE(red_triarius_figures2[5].IsMoveLegal(red_triarius_figures2[5].MoveLeft(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveLeft_Ally_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_Ally_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[0].IsMoveLegal(purple_triarius_figures2[0].MoveLeft(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveLeft_SkipOverFigures_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_SkipOverFigures_Red) {
 	EXPECT_FALSE(red_triarius_figures2[5].IsMoveLegal(red_triarius_figures2[0].MoveLeft(3), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveLeft_SkipOverFigures_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveLeft_SkipOverFigures_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[0].IsMoveLegal(purple_triarius_figures2[0].MoveLeft(4), test_board2));
 }
 
@@ -250,65 +262,64 @@ TEST_F(TriariusFigure, MoveLeft_SkipOverFigures_Purple) {
 //MOVING RIGHT
 //------------------------------------------------------------------------------------------------------------------------\\
 
-TEST_F(TriariusFigure, MoveRight_OutOfBoard_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_OutOfBoard_Red) {
 	EXPECT_FALSE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveRight(7), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveRight_OutOfBoard_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_OutOfBoard_Purple) {
 	EXPECT_FALSE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveRight(7), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveRight_Empty_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_Empty_Red) {
 	EXPECT_TRUE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveRight(6), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveRight_Empty_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_Empty_Purple) {
 	EXPECT_TRUE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveRight(6), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveRight_Enemy_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_Enemy_Red) {
 	EXPECT_TRUE(red_triarius_figures2[0].IsMoveLegal(red_triarius_figures2[0].MoveRight(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveRight_Enemy_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_Enemy_Purple) {
 	EXPECT_TRUE(purple_triarius_figures2[1].IsMoveLegal(purple_triarius_figures2[1].MoveRight(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveRight_Ally_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_Ally_Red) {
 	EXPECT_FALSE(red_triarius_figures2[1].IsMoveLegal(red_triarius_figures2[1].MoveRight(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveRight_Ally_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_Ally_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[2].IsMoveLegal(purple_triarius_figures2[2].MoveRight(2), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveRight_SkipOverFigures_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_SkipOverFigures_Red) {
 	EXPECT_FALSE(red_triarius_figures2[0].IsMoveLegal(red_triarius_figures2[0].MoveRight(3), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveRight_SkipOverFigures_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveRight_SkipOverFigures_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[1].IsMoveLegal(purple_triarius_figures2[1].MoveRight(3), test_board2));
 }
-
 
 
 //------------------------------------------------------------------------------------------------------------------------\\
 //MOVING DIAGONAL LEFT FRONT
 //------------------------------------------------------------------------------------------------------------------------\\
 
-TEST_F(TriariusFigure, MoveDiagonalLeftFront_Empty_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveDiagonalLeftFront_Empty_Red) {
 	EXPECT_TRUE(red_triarius_figures1[0].IsMoveLegal(red_triarius_figures1[0].MoveDiagonalLeftFront(), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveDiagonalLeftFront_Empty_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveDiagonalLeftFront_Empty_Purple) {
 	EXPECT_TRUE(purple_triarius_figures1[4].IsMoveLegal(purple_triarius_figures1[4].MoveDiagonalLeftFront(), test_board1));
 }
 
-TEST_F(TriariusFigure, MoveDiagonalLeftFront_Enemy_Red) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveDiagonalLeftFront_Enemy_Red) {
 	EXPECT_FALSE(red_triarius_figures2[5].IsMoveLegal(red_triarius_figures2[5].MoveDiagonalLeftFront(), test_board2));
 }
 
-TEST_F(TriariusFigure, MoveDiagonalLeftFront_Enemy_Purple) {
+TEST_F(TriariusFigure, IsMoveLegal_MoveDiagonalLeftFront_Enemy_Purple) {
 	EXPECT_FALSE(purple_triarius_figures2[1].IsMoveLegal(purple_triarius_figures2[1].MoveDiagonalLeftFront(), test_board2));
 }
 

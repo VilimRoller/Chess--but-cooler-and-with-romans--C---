@@ -9,19 +9,15 @@ Consul::Consul(figureColour figure_colour,
 Consul::~Consul() {
 }
 
-std::vector<BoardCoordinates> Consul::GetLegalMoves(const BoardImage& board_layout) const {
-	std::vector<BoardCoordinates> result;
+void Consul::CalculateLegalMoves(const BoardImage& board_layout) {
+	ValidateMove(board_layout, MoveFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveBack(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveLeft(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveRight(), IsPlaceEmptyLambda);
 
-	ValidateMove(board_layout, result, MoveFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveLeft(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveRight(), IsPlaceEmptyLambda);
-
-	ValidateMove(board_layout, result, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
-
-	return result;
+	ValidateMove(board_layout, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
 }
 

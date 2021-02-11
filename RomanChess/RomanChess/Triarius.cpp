@@ -9,19 +9,15 @@ Triarius::Triarius(figureColour figure_colour,
 Triarius::~Triarius(){
 }
 
-std::vector<BoardCoordinates> Triarius::GetLegalMoves(const BoardImage& board_layout) const{
-	std::vector<BoardCoordinates> result;
+void Triarius::CalculateLegalMoves(const BoardImage& board_layout) {
+	ValidateMove(board_layout, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
+	ValidateMove(board_layout, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
 
-	ValidateMove(board_layout, result, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, result, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
-
-	ValidateMoveInDirection(board_layout, result, [&](int num_of_spaces) {return MoveFront(num_of_spaces); });
-	ValidateMoveInDirection(board_layout, result, [&](int num_of_spaces) {return MoveBack(num_of_spaces); });
-	ValidateMoveInDirection(board_layout, result, [&](int num_of_spaces) {return MoveLeft(num_of_spaces); });
-	ValidateMoveInDirection(board_layout, result, [&](int num_of_spaces) {return MoveRight(num_of_spaces); });
-
-	return result;
+	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveFront(num_of_spaces); });
+	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveBack(num_of_spaces); });
+	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveLeft(num_of_spaces); });
+	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveRight(num_of_spaces); });
 }
 

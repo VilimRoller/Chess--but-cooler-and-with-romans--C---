@@ -70,9 +70,9 @@ namespace Constants {
 
 	namespace AI {
 
-		constexpr int AIMovesLimit = 200;
-		constexpr int max_value = 1000000;
-		constexpr int min_value = -1000000;
+		constexpr int MaxDepth = 5;
+		constexpr int MaxValue =  1000000;
+		constexpr int MinValue = -1000000;
 
 		namespace FigureEvaluation {
 

@@ -48,7 +48,6 @@
     <ClCompile Include="ChessApp.cpp" />
     <ClCompile Include="Consul.cpp" />
     <ClCompile Include="Eques.cpp" />
-    <ClCompile Include="Figure.cpp" />
     <ClCompile Include="Hastatus.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="PontifexMaximus.cpp" />
@@ -81,7 +80,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>

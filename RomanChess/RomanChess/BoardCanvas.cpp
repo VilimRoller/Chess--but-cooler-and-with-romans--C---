@@ -50,43 +50,54 @@ void BoardCanvas::SetRectangleSpritePosition(const int row, const int collumn) {
 void BoardCanvas::InitializeRomanChessFigures(const BoardImage& board_image) {
 	for (int row = 0; row < Constants::boardSize; ++row) {
 		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
-			SetFigure(board_image[row][collumn], BoardCoordinates(collumn, row));
+			SetFigure(board_image, BoardCoordinates(collumn, row));
 		}
 	}
 }
 
-void BoardCanvas::SetFigure(const FigureImage& figure, const BoardCoordinates& position) {
-	switch (figure.first) {
+void BoardCanvas::SetFigure(const BoardImage& board, const BoardCoordinates& position) {
+	auto figure_type = board[position.y][position.x].first;
+	auto figure_colour = board[position.y][position.x].second;
+	auto* selected_figure = &figures_[position.y][position.x];
+
+	switch (figure_type) {
 	case figureType::Veles:
-		figures_[position.y][position.x] = std::make_shared<Veles>(figure.second, position);
+		*selected_figure = std::make_shared<Veles>(figure_colour, position);
 		break;
 	case figureType::Hastatus:
-		figures_[position.y][position.x] = std::make_shared<Hastatus>(figure.second, position);
+		*selected_figure = std::make_shared<Hastatus>(figure_colour, position);
 		break;
 	case figureType::Princeps:
-		figures_[position.y][position.x] = std::make_shared<Princeps>(figure.second, position);
+		*selected_figure = std::make_shared<Princeps>(figure_colour, position);
 		break;
 	case figureType::Triarius:
-		figures_[position.y][position.x] = std::make_shared<Triarius>(figure.second, position);
+		*selected_figure = std::make_shared<Triarius>(figure_colour, position);
 		break;
 	case figureType::Eques:
-		figures_[position.y][position.x] = std::make_shared<Eques>(figure.second, position);
+		*selected_figure = std::make_shared<Eques>(figure_colour, position);
 		break;
 	case figureType::Consul:
-		figures_[position.y][position.x] = std::make_shared<Consul>(figure.second, position);
+		*selected_figure = std::make_shared<Consul>(figure_colour, position);
 		break;
 	case figureType::PontifexMaximus:
-		figures_[position.y][position.x] = std::make_shared<PontifexMaximus>(figure.second, position);
+		*selected_figure = std::make_shared<PontifexMaximus>(figure_colour, position);
 		break;
 	default:
-		figures_[position.y][position.x] = nullptr;
+		*selected_figure = nullptr;
 	}
-	MakeFigureSprite(position);
+	InitializeLegalMoves(*selected_figure, board);
+	MakeFigureSprite(*selected_figure);
 }
 
-inline void BoardCanvas::MakeFigureSprite(const BoardCoordinates& position) {
-	if (figures_[position.y][position.x] != nullptr) {
-		figures_[position.y][position.x]->InitializeFigureSprite(figure_textures_);
+inline void BoardCanvas::MakeFigureSprite(const std::shared_ptr<Figure>& figure) {
+	if (IsFigureOnTile(figure)) {
+		figure->InitializeFigureSprite(figure_textures_);
+	}
+}
+
+inline void BoardCanvas::InitializeLegalMoves(const std::shared_ptr<Figure>& figure, const BoardImage& board) {
+	if (IsFigureOnTile(figure)) {
+		figure->RefreshLegalMoves(board);
 	}
 }
 
@@ -164,11 +175,11 @@ void BoardCanvas::HandleMouseButtonPressedEvent(sf::Event& mouse_event) {
 
 void BoardCanvas::HandleMouseButtonReleasedEvent(sf::Event& mouse_event) {
     SetEventFigurePosition(mouse_event);
+	RefreshBoardImage();
     DisableDragging();
     ResetEventFigurePtr();
     ResetEventFigureOffset();
 	ResetRectangleCoordinates();
-	RefreshBoardImage();
 }
 
 void BoardCanvas::HandleMouseMovedEvent(sf::Event& mouse_event) {
@@ -204,9 +215,11 @@ void BoardCanvas::SetEventFigureSpritePtr(sf::Event& mouse_event) {
 																 mouse_event.mouseButton.y);
 
     if(IsOnCanvas(x_coordinate, y_coordinate) && IsFigureOnTile(figures_[y_coordinate][x_coordinate])) {
-		SetRectangleCoordinates(x_coordinate, y_coordinate);
 		SetEventFigurePtr(x_coordinate, y_coordinate);
 		SetEventFigureOffset(mouse_vector_coordinates);
+		RefreshEventFigureLegalMoves();
+		SetRectangleCoordinates(x_coordinate, y_coordinate);
+
     }
 }
 
@@ -230,7 +243,7 @@ inline void BoardCanvas::ResetEventFigureOffset() {
 void BoardCanvas::SetRectangleCoordinates(const int x_coordinate, const int y_coordinate) {
 	EnableDrawingRectangles();
 	RefreshBoardImage();
-	std::vector<BoardCoordinates> all_rectangle_coordinates = figures_[y_coordinate][x_coordinate]->GetLegalMoves(board_image_);
+	std::vector<BoardCoordinates> all_rectangle_coordinates = figures_[y_coordinate][x_coordinate]->GetLegalMoves();
 
 	for (const auto& coordinate : all_rectangle_coordinates) {
 		EmplaceRectangleCoordinate(coordinate);
@@ -285,7 +298,8 @@ inline const sf::Vector2f BoardCanvas::GetEventSpriteOffset() const {
 
 void BoardCanvas::SetEventFigurePosition(sf::Event& mouse_event) {
     if (IsFigureOnTile(event_figure_ptr_)) {
-		auto mouse_coordinates = GetMouseIntegerCoordinates(std::make_pair(mouse_event.mouseButton.x, mouse_event.mouseButton.y));
+		auto mouse_coordinates = GetMouseIntegerCoordinates(std::make_pair(mouse_event.mouseButton.x,
+																		   mouse_event.mouseButton.y));
 		
 		MoveEventFigure(mouse_coordinates.first, mouse_coordinates.second);
 		CheckGameOver();
@@ -313,12 +327,18 @@ inline void BoardCanvas::ResetOldEventFigurePosition() {
 	figures_[event_figure_ptr_->GetPosition().y][event_figure_ptr_->GetPosition().x] = nullptr;
 }
 
+inline void BoardCanvas::SetEventFigureCoordinates(const int x_coordinate, const int y_coordinate) {
+	event_figure_ptr_->SetPosition(x_coordinate, y_coordinate);
+}
+
 inline void BoardCanvas::RefreshEventFigureSpritePosition() {
 	event_figure_ptr_->SetFigureSpritePosition();
 }
 
-inline void BoardCanvas::SetEventFigureCoordinates(const int x_coordinate, const int y_coordinate) {
-	event_figure_ptr_->SetPosition(x_coordinate, y_coordinate);
+inline void BoardCanvas::RefreshEventFigureLegalMoves() {
+	if (IsFigureOnTile(event_figure_ptr_)) {
+		event_figure_ptr_->RefreshLegalMoves(board_image_);
+	}
 }
 
 inline sf::Vector2f BoardCanvas::GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const {

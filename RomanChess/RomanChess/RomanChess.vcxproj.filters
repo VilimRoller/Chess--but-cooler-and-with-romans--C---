@@ -113,9 +113,6 @@
     <ClCompile Include="Hastatus.cpp">
       <Filter>Source Files\figures</Filter>
     </ClCompile>
-    <ClCompile Include="Figure.cpp">
-      <Filter>Source Files\figures</Filter>
-    </ClCompile>
     <ClCompile Include="Princeps.cpp">
       <Filter>Source Files\figures</Filter>
     </ClCompile>

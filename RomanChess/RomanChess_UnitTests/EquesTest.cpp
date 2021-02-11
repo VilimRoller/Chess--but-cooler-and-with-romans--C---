@@ -42,6 +42,10 @@ protected:
 		TestFunctions::MakeMultipleFigureImages(purple_eques_figure, purple_figure_coordinates, board_figures);
 		TestFunctions::SetMultipleFigureImages(test_board, board_figures);
 
+		for (int i = 0; i < red_figure_coordinates.size(); ++i) {
+			red_eques_figures[i].CalculateLegalMoves(test_board);
+			purple_eques_figures[i].CalculateLegalMoves(test_board);
+		}
 	}
 
 	void TearDown() override {}
@@ -52,21 +56,21 @@ protected:
 };
 
 TEST_F(EquesFigure, NumberOfLegalMoves_Red) {
-	EXPECT_EQ(red_eques_figures[0].GetLegalMoves(test_board).size(), 4);
-	EXPECT_EQ(red_eques_figures[1].GetLegalMoves(test_board).size(), 8);
-	EXPECT_EQ(red_eques_figures[2].GetLegalMoves(test_board).size(), 5);
-	EXPECT_EQ(red_eques_figures[3].GetLegalMoves(test_board).size(), 4);
-	EXPECT_EQ(red_eques_figures[4].GetLegalMoves(test_board).size(), 7);
-	EXPECT_EQ(red_eques_figures[5].GetLegalMoves(test_board).size(), 4);
+	EXPECT_EQ(red_eques_figures[0].GetLegalMoves().size(), 4);
+	EXPECT_EQ(red_eques_figures[1].GetLegalMoves().size(), 8);
+	EXPECT_EQ(red_eques_figures[2].GetLegalMoves().size(), 5);
+	EXPECT_EQ(red_eques_figures[3].GetLegalMoves().size(), 4);
+	EXPECT_EQ(red_eques_figures[4].GetLegalMoves().size(), 7);
+	EXPECT_EQ(red_eques_figures[5].GetLegalMoves().size(), 4);
 }
 
 TEST_F(EquesFigure, NumberOfLegalMoves_Purple) {
-	EXPECT_EQ(purple_eques_figures[0].GetLegalMoves(test_board).size(), 2);
-	EXPECT_EQ(purple_eques_figures[1].GetLegalMoves(test_board).size(), 3);
-	EXPECT_EQ(purple_eques_figures[2].GetLegalMoves(test_board).size(), 7);
-	EXPECT_EQ(purple_eques_figures[3].GetLegalMoves(test_board).size(), 7);
-	EXPECT_EQ(purple_eques_figures[4].GetLegalMoves(test_board).size(), 3);
-	EXPECT_EQ(purple_eques_figures[5].GetLegalMoves(test_board).size(), 4);
+	EXPECT_EQ(purple_eques_figures[0].GetLegalMoves().size(), 2);
+	EXPECT_EQ(purple_eques_figures[1].GetLegalMoves().size(), 3);
+	EXPECT_EQ(purple_eques_figures[2].GetLegalMoves().size(), 7);
+	EXPECT_EQ(purple_eques_figures[3].GetLegalMoves().size(), 7);
+	EXPECT_EQ(purple_eques_figures[4].GetLegalMoves().size(), 3);
+	EXPECT_EQ(purple_eques_figures[5].GetLegalMoves().size(), 4);
 }
 
 //------------------------------------------------------------------------------------------------------------------------\\
