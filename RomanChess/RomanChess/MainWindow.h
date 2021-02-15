@@ -2,8 +2,7 @@
 #include "wxConstants.h"
 #include "wxID.h"
 #include "wx/artprov.h"
-#include "RomanChessGame.h"
-
+#include "BoardCanvas.h"
 
 class MainWindow :
     public wxFrame
@@ -71,7 +70,7 @@ public:
 private:
 
     bool is_game_saved_ = true;
-    std::shared_ptr<RomanChessGame> game_ = nullptr;
+    std::shared_ptr<BoardCanvas> game_;
 
     //Smart pointers are not supported by wxWidgets
     //Memory will be freed by wxWidgets framework automatically after closing window

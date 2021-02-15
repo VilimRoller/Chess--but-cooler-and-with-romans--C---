@@ -9,8 +9,5 @@ public:
 		int figure_number = 0);
 
 	~Consul();
-
-	void CalculateLegalMoves(const BoardImage& board_layout) override;
-
 };
 

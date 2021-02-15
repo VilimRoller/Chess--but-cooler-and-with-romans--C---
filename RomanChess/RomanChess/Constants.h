@@ -13,8 +13,10 @@ using FigureImage = std::pair<figureType, figureColour>;
 namespace Constants {
 	constexpr int boardSize = 8;
 	constexpr int lastBoardElement = boardSize - 1;
-	constexpr int dequeMovesNumber = 20;
+	constexpr std::size_t dequeMovesNumber = std::size_t(20);
 	constexpr int PixelMultiplier = 100;
+	constexpr int hastatusMaxMovesFront = 2;
+	constexpr int equesJump = 2;
 
 #pragma region FIGURE_IMAGES
 	constexpr FigureImage VelesImage_red			  { figureType::Veles,			 figureColour::Red		 };

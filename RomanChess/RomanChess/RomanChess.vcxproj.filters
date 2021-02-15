@@ -81,9 +81,6 @@
     <ClInclude Include="PontifexMaximus.h">
       <Filter>Header Files\Figures</Filter>
     </ClInclude>
-    <ClInclude Include="RomanChessGame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FigureIncludes.h">
       <Filter>Header Files\Figures</Filter>
     </ClInclude>
@@ -91,6 +88,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RomanChessNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RomanChessGameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -130,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="PontifexMaximus.cpp">
       <Filter>Source Files\figures</Filter>
-    </ClCompile>
-    <ClCompile Include="RomanChessGame.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RomanChessAI.cpp">
       <Filter>Source Files</Filter>

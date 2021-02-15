@@ -10,7 +10,5 @@ public:
 
 	~PontifexMaximus();
 
-	void CalculateLegalMoves(const BoardImage& board_layout) override;
-
 };
 

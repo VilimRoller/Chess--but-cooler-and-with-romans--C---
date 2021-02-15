@@ -12,6 +12,5 @@ public:
 
 	~Princeps();
 
-	void CalculateLegalMoves(const BoardImage& board_layout) override;
 };
 

@@ -43,9 +43,7 @@ public:
 		return figure_sprite_;
 	}
 
-	auto GetEnemyColourLambda() const{
-		return IsFigureRed() ? IsPlacePurpleLambda : IsPlaceRedLambda;
-	}
+
 
 	//Setters
 	void SetPosition(const BoardCoordinates& new_poistion) {
@@ -70,14 +68,6 @@ public:
 	}
 
 
-	void InitializeFigureLambdas() {
-		IsPlaceEmptyLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) 
-								{return IsPlaceEmpty(board_layout, position); };
-		IsPlaceRedLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) 
-							  {return IsPlaceRed(board_layout, position); };
-		IsPlacePurpleLambda = [&](const BoardImage& board_layout, const BoardCoordinates& position) 
-								 {return IsPlacePurple(board_layout, position); };
-	}
 
 	const FigureImage GetEmptyFigure() const {
 		return FigureImage(figureType::no_type, figureColour::no_colour);
@@ -116,11 +106,9 @@ public:
 		SetFigureColour(figure_colour);
 		SetFigureType(figure_type);
 		SetPosition(initial_position);
-		InitializeFigureLambdas();
 	}
 
 	void InitializeFigureSprite(const sf::Texture& figure_texture) {
-		//figure_sprite_ = std::make_shared<sf::Sprite>();
 		SetFigureTextureRect();
 		SetFigureSpritePosition();
 
@@ -164,133 +152,14 @@ public:
 		}
 	}
 
-	bool IsStillOnBoard(const BoardCoordinates& coordinates) const {
-		return  (coordinates.x >= 0) && (coordinates.x <= Constants::boardSize - 1) &&
-			(coordinates.y >= 0) && (coordinates.y <= Constants::boardSize - 1);
-	}
-
-	bool IsMoveLegal(const BoardCoordinates& new_position, const BoardImage& board_layout) {
-		return std::any_of(legal_moves_.begin(),
-						   legal_moves_.end(),
-						   [&new_position](const auto& legal_move) {return new_position == legal_move; });
-	}
-
-	//Methods for checking tiles around the figure
-	//Surrounding is analyzed from figure's point of view
-	bool IsPlaceEmpty(const BoardImage& board_layout, const BoardCoordinates& position) const {
-		if (IsStillOnBoard(position)) {
-			return IsEmpty(board_layout[position.y][position.x]);
-		}
-		return false;
-	}
-
-	bool IsPlaceRed(const BoardImage& board_layout, const BoardCoordinates& position) const {
-		if (IsStillOnBoard(position)) {
-			return IsRed(board_layout[position.y][position.x]);
-		}
-		return false;
-	}
-
-	bool IsPlacePurple(const BoardImage& board_layout, const BoardCoordinates& position) const {
-		if (IsStillOnBoard(position)) {
-			return IsPurple(board_layout[position.y][position.x]);
-		}
-		return false;
-	}
 
 
-	 const BoardCoordinates MoveFront(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed()?	BoardCoordinates(0, -number_of_spaces) :
-											BoardCoordinates(0, number_of_spaces));
-	}
 
-	const BoardCoordinates MoveBack(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed()?	BoardCoordinates(0, number_of_spaces) :
-											BoardCoordinates(0, -number_of_spaces));
-	}
 
-	const BoardCoordinates MoveLeft(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed()?	BoardCoordinates(-number_of_spaces, 0) :
-											BoardCoordinates(number_of_spaces, 0));
-	}
-
-	const BoardCoordinates MoveRight(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed()?	BoardCoordinates(number_of_spaces, 0) :
-											BoardCoordinates(-number_of_spaces, 0));
-	}
-
-	const BoardCoordinates MoveDiagonalLeftFront(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed()?	BoardCoordinates(-number_of_spaces, -number_of_spaces) :
-											BoardCoordinates(number_of_spaces, number_of_spaces));
-	}
-
-	const BoardCoordinates MoveDiagonalLeftBack(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed()?	BoardCoordinates(-number_of_spaces, number_of_spaces) :
-											BoardCoordinates(number_of_spaces, -number_of_spaces));
-	}
-
-	const BoardCoordinates MoveDiagonalRightFront(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed()?	BoardCoordinates(number_of_spaces, -number_of_spaces) :
-											BoardCoordinates(-number_of_spaces, number_of_spaces));
-	}
-
-	const BoardCoordinates MoveDiagonalRightBack(const int number_of_spaces = 1) const {
-		return position_ + (IsFigureRed() ?	BoardCoordinates(number_of_spaces, number_of_spaces) :
-											BoardCoordinates(-number_of_spaces, -number_of_spaces));
-	}
-
-	std::vector<BoardCoordinates> GetLegalMoves() const{
-		return legal_moves_;
-	}
-
-	void ClearLegalMoves() {
-		legal_moves_.clear();
-	}
-
-	void AddLegalMove(const BoardCoordinates& move_coordinate) {
-		legal_moves_.emplace_back(move_coordinate);
-	}
-
-	void RefreshLegalMoves(const BoardImage& board_layout) {
-		ClearLegalMoves();
-		CalculateLegalMoves(board_layout);
-	}
-
-	//Validate figure's move to position
-	template <class LAMBDA>
-	bool ValidateMove(const BoardImage& board_layout,
-		const BoardCoordinates& position,
-		LAMBDA&& ConditionLambda) {
-		if (ConditionLambda(board_layout, position)) {
-			AddLegalMove(position);
-			return true;
-		}
-		return false;
-	}
-
-	//Validate figure's moves in direction defined by DirectionLambda
-	template <class LAMBDA>
-	void ValidateMoveInDirection(const BoardImage& board_layout,
-		LAMBDA&& DirectionLambda){
-		for (int num_of_spaces = 1; IsStillOnBoard(DirectionLambda(num_of_spaces)); ++num_of_spaces) {
-			if (!ValidateMove(board_layout, DirectionLambda(num_of_spaces), IsPlaceEmptyLambda)) {
-				ValidateMove(board_layout, DirectionLambda(num_of_spaces), GetEnemyColourLambda());
-				break; //Avoid skipping over figures
-			}
-		}
-	}
-
-	//Specific for every figure
-	virtual void CalculateLegalMoves(const BoardImage& board_layout) = 0;
-	
-	ConditionLambdaType IsPlaceEmptyLambda;
-	ConditionLambdaType IsPlaceRedLambda;
-	ConditionLambdaType IsPlacePurpleLambda;
 
 	sf::Sprite figure_sprite_;
 
 private:
 	BoardCoordinates position_;
 	FigureImage figure_image_;
-	std::vector<BoardCoordinates> legal_moves_;
 };

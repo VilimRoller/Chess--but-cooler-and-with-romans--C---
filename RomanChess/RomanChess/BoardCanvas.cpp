@@ -8,10 +8,9 @@ BoardCanvas::BoardCanvas(wxWindow* Parent,
     wxPoint& Position,
     wxSize& Size,
     long Style) : wxSfmlCanvas(Parent, Id, Position, Size, Style) {
-    SetBoardImage();
 	LoadTextures();
 	InitializeBoardSprite();
-	InitializeRomanChessFigures(board_image_);
+	InitializeRomanChessFigures();
 	InitializeRectangleSprites();
 }
 
@@ -47,57 +46,50 @@ void BoardCanvas::SetRectangleSpritePosition(const int row, const int collumn) {
 																   row	   * Constants::PixelMultiplier));
 }
 
-void BoardCanvas::InitializeRomanChessFigures(const BoardImage& board_image) {
+void BoardCanvas::InitializeRomanChessFigures() {
 	for (int row = 0; row < Constants::boardSize; ++row) {
 		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
-			SetFigure(board_image, BoardCoordinates(collumn, row));
+			SetFigure(BoardCoordinates(collumn, row));
 		}
 	}
 }
 
-void BoardCanvas::SetFigure(const BoardImage& board, const BoardCoordinates& position) {
-	auto figure_type = board[position.y][position.x].first;
-	auto figure_colour = board[position.y][position.x].second;
-	auto* selected_figure = &figures_[position.y][position.x];
+void BoardCanvas::SetFigure(BoardCoordinates&& position) {
+	auto& figure_type = chess_engine_.GetBoardImage()[position.y][position.x].first;
+	auto& figure_colour = chess_engine_.GetBoardImage()[position.y][position.x].second;
+	auto& selected_figure = figures_[position.y][position.x];
 
 	switch (figure_type) {
 	case figureType::Veles:
-		*selected_figure = std::make_shared<Veles>(figure_colour, position);
+		selected_figure = std::make_shared<Veles>(figure_colour, position);
 		break;
 	case figureType::Hastatus:
-		*selected_figure = std::make_shared<Hastatus>(figure_colour, position);
+		selected_figure = std::make_shared<Hastatus>(figure_colour, position);
 		break;
 	case figureType::Princeps:
-		*selected_figure = std::make_shared<Princeps>(figure_colour, position);
+		selected_figure = std::make_shared<Princeps>(figure_colour, position);
 		break;
 	case figureType::Triarius:
-		*selected_figure = std::make_shared<Triarius>(figure_colour, position);
+		selected_figure = std::make_shared<Triarius>(figure_colour, position);
 		break;
 	case figureType::Eques:
-		*selected_figure = std::make_shared<Eques>(figure_colour, position);
+		selected_figure = std::make_shared<Eques>(figure_colour, position);
 		break;
 	case figureType::Consul:
-		*selected_figure = std::make_shared<Consul>(figure_colour, position);
+		selected_figure = std::make_shared<Consul>(figure_colour, position);
 		break;
 	case figureType::PontifexMaximus:
-		*selected_figure = std::make_shared<PontifexMaximus>(figure_colour, position);
+		selected_figure = std::make_shared<PontifexMaximus>(figure_colour, position);
 		break;
 	default:
-		*selected_figure = nullptr;
+		selected_figure = nullptr;
 	}
-	InitializeLegalMoves(*selected_figure, board);
-	MakeFigureSprite(*selected_figure);
+	MakeFigureSprite(std::move(position));
 }
 
-inline void BoardCanvas::MakeFigureSprite(const std::shared_ptr<Figure>& figure) {
-	if (IsFigureOnTile(figure)) {
-		figure->InitializeFigureSprite(figure_textures_);
-	}
-}
-
-inline void BoardCanvas::InitializeLegalMoves(const std::shared_ptr<Figure>& figure, const BoardImage& board) {
-	if (IsFigureOnTile(figure)) {
-		figure->RefreshLegalMoves(board);
+inline void BoardCanvas::MakeFigureSprite(BoardCoordinates&& coordinates) {
+	if (IsFigureOnTile(coordinates)) {
+		figures_[coordinates.y][coordinates.x]->InitializeFigureSprite(figure_textures_);
 	}
 }
 
@@ -167,7 +159,7 @@ void BoardCanvas::HandleCanvasEvent() {
 }
 
 void BoardCanvas::HandleMouseButtonPressedEvent(sf::Event& mouse_event) {
-	if (!IsGameOver()) {
+	if (!chess_engine_.IsGameOver()) {
 		EnableDragging();
 		SetEventFigureSpritePtr(mouse_event);
 	}
@@ -175,7 +167,6 @@ void BoardCanvas::HandleMouseButtonPressedEvent(sf::Event& mouse_event) {
 
 void BoardCanvas::HandleMouseButtonReleasedEvent(sf::Event& mouse_event) {
     SetEventFigurePosition(mouse_event);
-	RefreshBoardImage();
     DisableDragging();
     ResetEventFigurePtr();
     ResetEventFigureOffset();
@@ -217,9 +208,9 @@ void BoardCanvas::SetEventFigureSpritePtr(sf::Event& mouse_event) {
     if(IsOnCanvas(x_coordinate, y_coordinate) && IsFigureOnTile(figures_[y_coordinate][x_coordinate])) {
 		SetEventFigurePtr(x_coordinate, y_coordinate);
 		SetEventFigureOffset(mouse_vector_coordinates);
-		RefreshEventFigureLegalMoves();
-		SetRectangleCoordinates(x_coordinate, y_coordinate);
+		chess_engine_.CalculateLegalMoves(event_figure_ptr_);
 
+		SetRectangleCoordinates(x_coordinate, y_coordinate);
     }
 }
 
@@ -242,16 +233,14 @@ inline void BoardCanvas::ResetEventFigureOffset() {
 
 void BoardCanvas::SetRectangleCoordinates(const int x_coordinate, const int y_coordinate) {
 	EnableDrawingRectangles();
-	RefreshBoardImage();
-	std::vector<BoardCoordinates> all_rectangle_coordinates = figures_[y_coordinate][x_coordinate]->GetLegalMoves();
 
-	for (const auto& coordinate : all_rectangle_coordinates) {
+	for (const auto& coordinate : chess_engine_.GetLegalMoves()) {
 		EmplaceRectangleCoordinate(coordinate);
 	}
 }
 
 inline void BoardCanvas::EmplaceRectangleCoordinate(const BoardCoordinates& coordinate) {
-	if (IsFigureOnTile(figures_[coordinate.y][coordinate.x])) {
+	if (IsFigureOnTile(coordinate)) {
 		red_rectangle_positions_.emplace_back(coordinate);
 	}
 	else {
@@ -271,7 +260,7 @@ inline void BoardCanvas::ClearRectangleVectors() {
 
 inline bool BoardCanvas::IsOnCanvas(const int x_coordinate, const int y_coordinate) const {
 	return (x_coordinate < Constants::boardSize) && (y_coordinate < Constants::boardSize)
-		&& (x_coordinate >= 0) && (y_coordinate >= 0);
+		&& (x_coordinate >= 0)					 && (y_coordinate >= 0);
 }
 
 inline bool BoardCanvas::IsOnCanvas(sf::Vector2f coordinates) const {
@@ -302,20 +291,29 @@ void BoardCanvas::SetEventFigurePosition(sf::Event& mouse_event) {
 																		   mouse_event.mouseButton.y));
 		
 		MoveEventFigure(mouse_coordinates.first, mouse_coordinates.second);
-		CheckGameOver();
+
+		chess_engine_.CheckGameOver();
+		if (chess_engine_.IsGameOver()) {
+			DisplayGameOverMessageBox();
+		}
 		RefreshEventFigureSpritePosition();
     }
 }
 
 void BoardCanvas::MoveEventFigure(const int x_coordinate, const int y_coordinate) {
 	if (IsEventMovable(x_coordinate, y_coordinate)) {
-		if (!CheckIfPontifexMaximus(figures_[y_coordinate][x_coordinate])) {
+		if (!chess_engine_.CheckIfPontifexMaximus(BoardCoordinates(x_coordinate, y_coordinate))) {
+			chess_engine_.CheckIfConsul(BoardCoordinates(x_coordinate, y_coordinate));
+			chess_engine_.MoveFigure(event_figure_ptr_->GetPosition(), BoardCoordinates(x_coordinate, y_coordinate));
 			SetFigurePtr(x_coordinate, y_coordinate);
 			ResetOldEventFigurePosition();
 			SetEventFigureCoordinates(x_coordinate, y_coordinate);
 		}
-		SaveBoardImageToDeque();
-		NextPlayerTurn();
+		else {
+			InitializeRomanChessFigures();
+		}
+		chess_engine_.SaveBoardImageToDeque();
+		chess_engine_.NextPlayerTurn();
 	}
 }
 
@@ -333,12 +331,6 @@ inline void BoardCanvas::SetEventFigureCoordinates(const int x_coordinate, const
 
 inline void BoardCanvas::RefreshEventFigureSpritePosition() {
 	event_figure_ptr_->SetFigureSpritePosition();
-}
-
-inline void BoardCanvas::RefreshEventFigureLegalMoves() {
-	if (IsFigureOnTile(event_figure_ptr_)) {
-		event_figure_ptr_->RefreshLegalMoves(board_image_);
-	}
 }
 
 inline sf::Vector2f BoardCanvas::GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const {
@@ -361,146 +353,29 @@ std::pair<int, int> BoardCanvas::GetOffsettedMouseIntegerCoordinates(const std::
 	return result;
 }
 
-const BoardImage BoardCanvas::MakeBoardImage(const RomanChessFigures& figures) const {
-	BoardImage result;
 
-	for (int row = 0; row < Constants::boardSize; ++row) {
-		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
-			if (IsFigureOnTile(figures[row][collumn])) {
-				result[row][collumn] = figures[row][collumn]->GetFigureImage();
-			}
-		}
-	}
-	return result;
-}
-
-inline void BoardCanvas::SetBoardImage(BoardImage new_image) {
-	board_image_ = new_image;
-}
-
-inline void BoardCanvas::RefreshBoardImage() {
-	board_image_ = MakeBoardImage(figures_);
-}
-
-void BoardCanvas::SaveBoardImageToDeque() {
-	board_image_deque_.emplace_back(MakeBoardImage(figures_));
-	if (IsDequeOverflowed()) {
-		board_image_deque_.pop_front();
-	}
-}
-
-inline bool BoardCanvas::IsDequeOverflowed() const {
-	return board_image_deque_.size() > Constants::dequeMovesNumber;
-}
-
-void BoardCanvas::NextPlayerTurn() {
-	player_turn_ = (player_turn_ == figureColour::Red ? figureColour::Purple : figureColour::Red);
-	++move_counter_;
-}
-
-
-void BoardCanvas::CheckGameOver() {
-	auto number_of_consuls = GetNumberOfConsuls();
-	if (!BothSidesHaveConsul(number_of_consuls)) {
-		SetGameOver();
-	}
-}
-
-inline void BoardCanvas::SetGameOver() {
-	is_game_over_ = true;
-	DisplayGameOverMessageBox();
-}
 
 inline void BoardCanvas::DisplayGameOverMessageBox() {
-	player_turn_ == figureColour::Purple ? wxMessageBox(wxConstantStrings::GameOverWinnerRedMessage) :
+	chess_engine_.GetPlayerTurn() == figureColour::Purple ? wxMessageBox(wxConstantStrings::GameOverWinnerRedMessage) :
 		wxMessageBox(wxConstantStrings::GameOverWinnerPurpleMessage);
 }
 
-inline bool BoardCanvas::IsGameOver() const {
-	return is_game_over_;
+
+inline bool BoardCanvas::IsFigureOnTile(const BoardCoordinates& coordinates) const {
+	return figures_[coordinates.y][coordinates.x] != nullptr;
 }
 
-std::pair<int, int> BoardCanvas::GetNumberOfConsuls() {
-	std::pair<int, int> result(0, 0);
-	for (const auto& row : figures_) {
-		for (const auto& figure_ptr : row) {
-			if (IsFigureOnTile(figure_ptr)) {
-				AddNumberOfConsuls(figure_ptr, result);
-			}
-		}
-	}
-	return result;
+inline bool BoardCanvas::IsFigureOnTile(const std::shared_ptr<Figure>& figure) const {
+	return figure != nullptr;
 }
 
-void BoardCanvas::AddNumberOfConsuls(const std::shared_ptr<Figure>& figure, std::pair<int, int>& consul_number) {
-	if (figure->GetType() == figureType::Consul) {
-		if (figure->IsFigureRed()) {
-			++consul_number.first;
-		}
-		else if (figure->IsFigurePurple()) {
-			++consul_number.second;
-		}
-	}
-}
-
-inline bool BoardCanvas::BothSidesHaveConsul(const std::pair<int, int>& consuls) const {
-	return consuls.first && consuls.second;
-}
-
-
-
-
-inline void BoardCanvas::ClearBoardImageDeque() {
-	board_image_deque_.clear();
-}
-
-bool BoardCanvas::CheckIfPontifexMaximus(const std::shared_ptr<Figure>& figure) {
-	if (IsFigureOnTile(figure)) {
-		if (figure->IsFigureType(figureType::PontifexMaximus)) {
-			RewindBoard(figure->GetFigureColour());
-			return true;
-		}
-	}
-	return false;
-}
-
-void BoardCanvas::RemovePontifexMaximus(const figureColour& figure_colour) {
-	for (auto& row : figures_) {
-		for (auto& figure_ptr : row) {
-			RemoveIfPontifexMaximus(figure_colour, figure_ptr);
-		}
-	}
-}
-
-inline void BoardCanvas::RemoveFigure(std::shared_ptr<Figure>& figure) {
-	figure = nullptr;
-}
-
-inline void BoardCanvas::RemoveIfPontifexMaximus(const figureColour& figure_colour, std::shared_ptr<Figure>& figure) {
-	if (IsFigureOnTile(figure)) {
-		if (figure->IsFigureColour(figure_colour) && figure->IsFigureType(figureType::PontifexMaximus)) {
-			RemoveFigure(figure);
-		}
-	}
-}
-
-void BoardCanvas::RewindBoard(const figureColour pontifex_colour) {
-	InitializeRomanChessFigures(board_image_deque_[0]);
-	RemovePontifexMaximus(pontifex_colour);
-	ClearBoardImageDeque();
-}
-
-
-inline bool BoardCanvas::IsFigureOnTile(const std::shared_ptr<Figure>& figure_ptr) const {
-	return figure_ptr != nullptr;
-}
 
 inline bool BoardCanvas::IsEventFigure(const int x_coordinate, const int y_coordinate) const {
 	return figures_[y_coordinate][x_coordinate] == event_figure_ptr_;
 }
 
 inline bool BoardCanvas::IsEventMoveLegal(const int x_coordinate, const int y_coordinate) const {
-	return event_figure_ptr_->IsMoveLegal(BoardCoordinates(x_coordinate, y_coordinate), board_image_);
+	return chess_engine_.IsMoveLegal(BoardCoordinates(x_coordinate, y_coordinate));
 }
 
 bool BoardCanvas::IsEventMovable(const int x_coordinate, const int y_coordinate) const {
@@ -514,12 +389,9 @@ bool BoardCanvas::IsEventMovable(const int x_coordinate, const int y_coordinate)
 
 inline bool BoardCanvas::IsEventFigureRightColour() const {
 	if (IsFigureOnTile(event_figure_ptr_)) {
-		return event_figure_ptr_->GetFigureColour() == GetPlayerTurnColour();
+		return event_figure_ptr_->GetFigureColour() ==chess_engine_.GetPlayerTurn();
 	}
 	return false;
 }
 
-inline const figureColour& BoardCanvas::GetPlayerTurnColour() const {
-	return player_turn_;
-}
 

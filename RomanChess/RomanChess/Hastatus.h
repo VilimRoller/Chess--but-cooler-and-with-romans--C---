@@ -11,16 +11,6 @@ public:
     
     ~Hastatus();
 
-    void CalculateLegalMoves(const BoardImage& board_layout) override;
-
-    void CheckFront(const BoardImage& board_layout);
-
-
-    //Illegal methods for this figure
-	const BoardCoordinates MoveLeftSide(const int number_of_spaces = 1) const = delete;
-	const BoardCoordinates MoveRightSide(const int number_of_spaces = 1) const = delete;
-	const BoardCoordinates MoveDiagonalLeftBack(const int number_of_spaces = 1) const = delete;
-	const BoardCoordinates MoveDiagonalRightBack(const int number_of_spaces = 1) const = delete;
 };
 
 

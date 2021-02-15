@@ -9,15 +9,4 @@ Triarius::Triarius(figureColour figure_colour,
 Triarius::~Triarius(){
 }
 
-void Triarius::CalculateLegalMoves(const BoardImage& board_layout) {
-	ValidateMove(board_layout, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
-
-	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveFront(num_of_spaces); });
-	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveBack(num_of_spaces); });
-	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveLeft(num_of_spaces); });
-	ValidateMoveInDirection(board_layout, [&](int num_of_spaces) {return MoveRight(num_of_spaces); });
-}
 

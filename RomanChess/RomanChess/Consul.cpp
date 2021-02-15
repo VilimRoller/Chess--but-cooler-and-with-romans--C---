@@ -9,15 +9,4 @@ Consul::Consul(figureColour figure_colour,
 Consul::~Consul() {
 }
 
-void Consul::CalculateLegalMoves(const BoardImage& board_layout) {
-	ValidateMove(board_layout, MoveFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveLeft(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveRight(), IsPlaceEmptyLambda);
-
-	ValidateMove(board_layout, MoveDiagonalLeftFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveDiagonalRightFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveDiagonalLeftBack(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveDiagonalRightBack(), IsPlaceEmptyLambda);
-}
 

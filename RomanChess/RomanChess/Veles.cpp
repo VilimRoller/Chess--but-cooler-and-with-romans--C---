@@ -7,10 +7,5 @@ Veles::Veles(figureColour figure_colour, BoardCoordinates initial_position, int 
 Veles::~Veles() {
 }
 
-void Veles::CalculateLegalMoves(const BoardImage& board_layout) {
-	ValidateMove(board_layout, MoveFront(), IsPlaceEmptyLambda);
-	ValidateMove(board_layout, MoveDiagonalLeftFront(), GetEnemyColourLambda());
-	ValidateMove(board_layout, MoveDiagonalRightFront(), GetEnemyColourLambda());
-}
 
 

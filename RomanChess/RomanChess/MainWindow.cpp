@@ -205,6 +205,8 @@ void MainWindow::OnClose(wxCloseEvent& event) {
 }
 
 void MainWindow::MakeNewGame() {
-    game_ = std::make_shared<RomanChessGame>();
-    game_->MakeNewBoardCanvas(this);
+	wxPoint board_canvas_point{ wxConstants::BoardCanvasPoint };
+	wxSize board_canvas_size{ wxConstants::BoardCanvasSize };
+
+    game_ = std::make_shared<BoardCanvas>(this, Canvas::ID::BOARD_CANVAS, board_canvas_point, board_canvas_size, 0);
 }
