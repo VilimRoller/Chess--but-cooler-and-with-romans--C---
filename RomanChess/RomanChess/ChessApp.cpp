@@ -1,6 +1,10 @@
 #include "ChessApp.h"
 #include "MainWindow.h"
-#include "BadColourException.h"
+#include "BadInputException.h"
+#include <system_error>
+#include <future>
+#include <new>
+
 
 wxIMPLEMENT_APP(ChessApp);
 
@@ -20,17 +24,29 @@ bool ChessApp::OnInit() {
 }
 
 bool ChessApp::OnExceptionInMainLoop() {
-	wxString error_message;
-
 	try {
 		throw;
 	}
 
-	catch (const BadColourException& exception) {
-		error_message = exception.what();
+	catch (const BadInputException& exception) {
+		wxString bad_input_message = exception.what();
+		wxLogError("Bad input exception has occurred: %s. \nProgram will now terminate", bad_input_message);
 	}
 
-	wxLogError("Exception has occured in function: %s. \nProgram will now terminate", error_message);
+	catch (const std::system_error& exception) {
+		wxString system_error_message = exception.what();
+		wxLogError("System error exception has occurred: %s. \nProgram will now terminate", system_error_message);
+	}
+
+	catch (const std::future_error& exception) {
+		wxString future_error_message = exception.what();
+		wxLogError("Future error exception has occurred: %s. \nProgram will now terminate", future_error_message);
+	}
+
+	catch (const std::bad_alloc& exception) {
+		wxString bad_alloc_message = exception.what();
+		wxLogError("Bad alloc exception has occurred: %s. \nProgram will now terminate", bad_alloc_message);
+	}
 
 	return false;
 }

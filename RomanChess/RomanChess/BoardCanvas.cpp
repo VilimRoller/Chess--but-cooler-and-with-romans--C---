@@ -14,49 +14,59 @@ BoardCanvas::BoardCanvas(wxWindow* Parent,
 	InitializeRectangleSprites();
 }
 
-void BoardCanvas::LoadTextures() {
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*                                              INITIALIZATION                                                 */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region INITIALIZATION
+
+void BoardCanvas::LoadTextures()  noexcept {
 	board_texture_.loadFromFile(ImagePaths::Board);
 	figure_textures_.loadFromFile(ImagePaths::Figures);
 	yellow_rectangle_texture_.loadFromFile(ImagePaths::Yellow_Rectangle);
 	red_rectangle_texture_.loadFromFile(ImagePaths::Red_Rectangle);
 }
 
-void BoardCanvas::InitializeBoardSprite() {
+void BoardCanvas::InitializeBoardSprite()  noexcept {
 	board_sprite_.setTexture(board_texture_);
 }
 
-void BoardCanvas::InitializeRectangleSprites() {
-	for (int row = 0; row < Constants::boardSize; ++row) {
-		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
-			SetRectangleSpriteTexture(row, collumn);
-			SetRectangleSpritePosition(row, collumn);
-		}
-	}
+void BoardCanvas::InitializeRectangleSprites()  noexcept {
+	for (int8 row = int8(0); row < Constants::boardSize; ++row)
+		for (int8 collumn = int8(0); collumn < Constants::boardSize; ++collumn)
+			SetRectangleSpriteTexturesAndPositions(BoardCoordinates(collumn, row));
 }
 
-void BoardCanvas::SetRectangleSpriteTexture(const int row, const int collumn) {
-	yellow_rectangles_[row][collumn].setTexture(yellow_rectangle_texture_);
-	red_rectangles_[row][collumn].setTexture(red_rectangle_texture_);
+inline void BoardCanvas::SetRectangleSpriteTexturesAndPositions(const BoardCoordinates coordinates) noexcept {
+	SetRectangleSpriteTextures(coordinates);
+	SetRectangleSpritePositions(coordinates);
 }
 
-void BoardCanvas::SetRectangleSpritePosition(const int row, const int collumn) {
-	yellow_rectangles_[row][collumn].setPosition(GetVectorCoordinates(collumn * Constants::PixelMultiplier,
-																	  row	  * Constants::PixelMultiplier));
-	red_rectangles_[row][collumn].setPosition(GetVectorCoordinates(collumn * Constants::PixelMultiplier, 
-																   row	   * Constants::PixelMultiplier));
+inline void BoardCanvas::SetRectangleSpriteTextures(const BoardCoordinates coordinates)  noexcept {
+	yellow_rectangles_[coordinates.y][coordinates.x].setTexture(yellow_rectangle_texture_);
+	red_rectangles_[coordinates.y][coordinates.x].setTexture(red_rectangle_texture_);
 }
 
-void BoardCanvas::InitializeRomanChessFigures() {
-	for (int row = 0; row < Constants::boardSize; ++row) {
-		for (int collumn = 0; collumn < Constants::boardSize; ++collumn) {
+inline void BoardCanvas::SetRectangleSpritePositions(const BoardCoordinates coordinates)  noexcept {
+	yellow_rectangles_[coordinates.y][coordinates.x].setPosition(GetSfVectorFromBoardCoordinates(coordinates));
+
+	red_rectangles_[coordinates.y][coordinates.x].setPosition(GetSfVectorFromBoardCoordinates(coordinates));
+}
+
+void BoardCanvas::InitializeRomanChessFigures()  noexcept {
+	for (int8 row = int8(0); row < Constants::boardSize; ++row)
+		for (int8 collumn = int8(0); collumn < Constants::boardSize; ++collumn)
 			SetFigure(BoardCoordinates(collumn, row));
-		}
-	}
 }
 
-void BoardCanvas::SetFigure(BoardCoordinates&& position) {
-	auto& figure_type = chess_engine_.GetBoardImage()[position.y][position.x].first;
-	auto& figure_colour = chess_engine_.GetBoardImage()[position.y][position.x].second;
+inline void BoardCanvas::SetFigure(BoardCoordinates position)  noexcept {
+	CreateFigure(position);
+	MakeFigureSprite(position);
+}
+
+inline void BoardCanvas::CreateFigure(BoardCoordinates position)  noexcept {
+	auto figure_type = chess_engine_.GetBoardImage()[position.y][position.x].type;
+	auto figure_colour = chess_engine_.GetBoardImage()[position.y][position.x].colour;
 	auto& selected_figure = figures_[position.y][position.x];
 
 	switch (figure_type) {
@@ -82,316 +92,420 @@ void BoardCanvas::SetFigure(BoardCoordinates&& position) {
 		selected_figure = std::make_shared<PontifexMaximus>(figure_colour, position);
 		break;
 	default:
-		selected_figure = nullptr;
+		CreateEmptyFigure(selected_figure);
+		break;
 	}
-	MakeFigureSprite(std::move(position));
 }
 
-inline void BoardCanvas::MakeFigureSprite(BoardCoordinates&& coordinates) {
-	if (IsFigureOnTile(coordinates)) {
-		figures_[coordinates.y][coordinates.x]->InitializeFigureSprite(figure_textures_);
-	}
+inline void BoardCanvas::CreateEmptyFigure(std::shared_ptr<Figure>& figure)  noexcept {
+	figure = nullptr;
 }
+
+inline void BoardCanvas::MakeFigureSprite(BoardCoordinates coordinates)  noexcept {
+	if (IsFigureOnTile(coordinates))
+		figures_[coordinates.y][coordinates.x]->InitializeFigureSprite(figure_textures_);
+}
+
+#pragma endregion
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*                                            RENDERING FUNCTIONS                                              */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region RENDERING FUNCTIONS
 
 void BoardCanvas::OnUpdate() {
-    HandleCanvasEvent();
-    DrawSprites();
+	HandleCanvasEvent();
+	DrawSprites();
 }
 
-inline void BoardCanvas::DrawSprites() {
+inline void BoardCanvas::DrawSprites() noexcept {
 	ClearCanvas();
 	DrawBoard();
 	DrawAllFigures();
-	DrawRectangles();
+	DrawRectanglesIfEnabled();
 }
 
-inline void BoardCanvas::ClearCanvas() {
+inline void BoardCanvas::ClearCanvas() noexcept {
 	clear(sf::Color(128, 128, 128));
 }
 
-inline void BoardCanvas::DrawRectangles() {
-	if (is_drawing_rectangles_enabled_) {
-		DrawYellowRectangles();
-		DrawRedRectangles();
-	}
+inline void BoardCanvas::DrawRectanglesIfEnabled() noexcept {
+	if (is_drawing_rectangles_enabled_)
+		DrawRectangles();
 }
 
-inline void BoardCanvas::DrawYellowRectangles() {
-	for (const auto& coordinate : yellow_rectangle_positions_) {
+inline void BoardCanvas::DrawRectangles() noexcept {
+	DrawYellowRectangles();
+	DrawRedRectangles();
+}
+
+void BoardCanvas::DrawYellowRectangles() noexcept {
+	for (const auto& coordinate : yellow_rectangle_positions_)
 		draw(yellow_rectangles_[coordinate.y][coordinate.x]);
-	}
 }
 
-inline void BoardCanvas::DrawRedRectangles() {
-	for (const auto& coordinate : red_rectangle_positions_) {
+void BoardCanvas::DrawRedRectangles() noexcept {
+	for (const auto& coordinate : red_rectangle_positions_)
 		draw(red_rectangles_[coordinate.y][coordinate.x]);
-	}
 }
 
-inline void BoardCanvas::DrawAllFigures() {
-    for (const auto& row : figures_) {
-        for (const auto& figure_ptr : row) {
-            if (IsFigureOnTile(figure_ptr)) {
-                draw(figure_ptr->GetFigureSprite());
-            }
-        }
-    }
+void BoardCanvas::DrawAllFigures() noexcept {
+    for (const auto& row : figures_)
+        for (const auto& figure_ptr : row)
+            if (IsFigureOnTile(figure_ptr))
+				DrawFigure(figure_ptr);
 }
 
-inline void BoardCanvas::DrawBoard() {
-        draw(board_sprite_);
+inline void BoardCanvas::DrawFigure(const std::shared_ptr<Figure>& figure_ptr) noexcept {
+	draw(figure_ptr->GetFigureSprite());
 }
 
-void BoardCanvas::HandleCanvasEvent() {
-    while (this->pollEvent(canvas_event_)) {
-        switch (canvas_event_.type) {
-        case sf::Event::MouseMoved:
-            HandleMouseMovedEvent(canvas_event_);
-            break;
-        case sf::Event::MouseButtonPressed:
-            HandleMouseButtonPressedEvent(canvas_event_);
-            break;
-        case sf::Event::MouseButtonReleased:
-            HandleMouseButtonReleasedEvent(canvas_event_);
-            break;
-        }
-    }
+inline void BoardCanvas::DrawBoard() noexcept {
+	draw(board_sprite_);
 }
 
-void BoardCanvas::HandleMouseButtonPressedEvent(sf::Event& mouse_event) {
-	if (!chess_engine_.IsGameOver()) {
-		EnableDragging();
-		SetEventFigureSpritePtr(mouse_event);
-	}
+#pragma endregion
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*                                              HANDLING EVENTS                                                */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region HANDLING EVENTS
+
+void BoardCanvas::HandleCanvasEvent() noexcept {
+	while (this->pollEvent(canvas_event_))
+		HandleCanvasEventType(canvas_event_);
 }
 
-void BoardCanvas::HandleMouseButtonReleasedEvent(sf::Event& mouse_event) {
-    SetEventFigurePosition(mouse_event);
+void BoardCanvas::HandleCanvasEventType(const sf::Event& mouse_event) noexcept {
+	if (GameIsNotOver())
+		switch (mouse_event.type) {
+		case sf::Event::MouseButtonPressed:
+			HandleMouseButtonPressedEvent(mouse_event);
+			break;
+		case sf::Event::MouseMoved:
+			HandleMouseMovedIfDraggingEnabled(mouse_event);
+			break;
+		case sf::Event::MouseButtonReleased:
+			HandleMouseButtonReleasedEvent(mouse_event);
+			break;
+		default:
+			break;
+		}
+}
+
+inline void BoardCanvas::HandleMouseButtonPressedEvent(const sf::Event& mouse_event) noexcept {
+	EnableDragging();
+	EnableDrawingRectangles();
+	SetEventFigureIfEligible(mouse_event);
+	SetRectangleCoordinates();
+}
+
+inline void BoardCanvas::HandleMouseMovedIfDraggingEnabled(const sf::Event& mouse_event) noexcept {
+	if (is_dragging_enabled_)
+		HandleMouseMovedEvent(mouse_event);
+}
+
+inline void BoardCanvas::HandleMouseMovedEvent(const sf::Event& mouse_event) noexcept {
+	sf::Vector2f mouse_position = GetMouseMoveVectorCoordinates(mouse_event);
+	if (IsOnCanvas(mouse_position))
+		MoveEventFigureSpriteIfEligible(mouse_position);
+}
+
+inline void BoardCanvas::HandleMouseButtonReleasedEvent(const sf::Event& mouse_event) noexcept {
+	SetEventFigurePositionIfEligible(mouse_event);
+	if (is_move_made_)
+		ManageEndOfMove();
+	ManageEndOfGameIfGameIsOver();
     DisableDragging();
-    ResetEventFigurePtr();
-    ResetEventFigureOffset();
-	ResetRectangleCoordinates();
+	ResetTemporaryValues();
 }
 
-void BoardCanvas::HandleMouseMovedEvent(sf::Event& mouse_event) {
-    if (is_dragging_enabled_) {
-		sf::Vector2f mouse_position = GetVectorCoordinates(mouse_event.mouseMove.x, mouse_event.mouseMove.y);
-        
-        if (IsOnCanvas(mouse_position)) {
-            MoveEventSprite(mouse_position);
-        }
-    }
+#pragma endregion
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*											EVENT FIGURE FUNCTIONS                                             */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region EVENT FIGURE FUNCTIONS
+
+void BoardCanvas::SetEventFigureIfEligible(const sf::Event& mouse_event) noexcept {
+	if (IsOnCanvas(GetMouseButtonBoardCoordinates(mouse_event)))
+		if (IsFigureOnTile(GetMouseButtonBoardCoordinates(mouse_event)))
+			SetEventFigure(mouse_event);
 }
 
-inline void BoardCanvas::EnableDragging() {
-	is_dragging_enabled_ = true;
+void BoardCanvas::SetEventFigure(const sf::Event& mouse_event) noexcept {
+	SetEventFigurePtr(GetMouseButtonBoardCoordinates(mouse_event));
+	SetEventFigureSpriteOffset(GetMouseButtonVectorCoordinates(mouse_event));
 }
 
-inline void BoardCanvas::DisableDragging() {
-	is_dragging_enabled_ = false;
+inline void BoardCanvas::SetEventFigurePtr(const BoardCoordinates coordinates) noexcept {
+	event_figure_ptr_ = figures_[coordinates.y][coordinates.x];
 }
 
-inline void BoardCanvas::EnableDrawingRectangles() {
-	is_drawing_rectangles_enabled_ = true;
-}
-
-inline void BoardCanvas::DisableDrawingRectangles() {
-	is_drawing_rectangles_enabled_ = false;
-}
-
-void BoardCanvas::SetEventFigureSpritePtr(sf::Event& mouse_event) {
-    int x_coordinate = mouse_event.mouseButton.x / Constants::PixelMultiplier;
-    int y_coordinate = mouse_event.mouseButton.y / Constants::PixelMultiplier;
-	sf::Vector2f mouse_vector_coordinates = GetVectorCoordinates(mouse_event.mouseButton.x, 
-																 mouse_event.mouseButton.y);
-
-    if(IsOnCanvas(x_coordinate, y_coordinate) && IsFigureOnTile(figures_[y_coordinate][x_coordinate])) {
-		SetEventFigurePtr(x_coordinate, y_coordinate);
-		SetEventFigureOffset(mouse_vector_coordinates);
-		chess_engine_.CalculateLegalMoves(event_figure_ptr_);
-
-		SetRectangleCoordinates(x_coordinate, y_coordinate);
-    }
-}
-
-inline void BoardCanvas::SetEventFigurePtr(const int x_coordinate, const int y_coordinate) {
-	event_figure_ptr_ = figures_[y_coordinate][x_coordinate];
-}
-
-inline void BoardCanvas::ResetEventFigurePtr() {
+inline void BoardCanvas::ResetEventFigurePtr() noexcept {
 	event_figure_ptr_ = nullptr;
 }
 
-inline void BoardCanvas::SetEventFigureOffset(const sf::Vector2f& mouse_vector_coordinates) {
-	sf::Vector2f event_figure_coordinates = event_figure_ptr_->GetFigureSprite().getPosition();
-	event_figure_offset_ = mouse_vector_coordinates - event_figure_coordinates;
+inline void BoardCanvas::SetEventFigureSpriteOffset(const sf::Vector2f& mouse_vector_coordinates) noexcept {
+	event_figure_offset_ = mouse_vector_coordinates - GetEventSpritePosition();
 }
 
-inline void BoardCanvas::ResetEventFigureOffset() {
+inline void BoardCanvas::ResetEventFigureSpriteOffset() noexcept {
 	event_figure_offset_ = sf::Vector2f(0, 0);
 }
 
-void BoardCanvas::SetRectangleCoordinates(const int x_coordinate, const int y_coordinate) {
-	EnableDrawingRectangles();
+inline void BoardCanvas::MoveEventFigureSpriteIfEligible(const sf::Vector2f& mouse_position) noexcept {
+	if (IsFigureOnTile(event_figure_ptr_))
+		MoveEventFigureSprite(mouse_position);
+}
 
-	for (const auto& coordinate : chess_engine_.GetLegalMoves()) {
+inline void BoardCanvas::MoveEventFigureSprite(const sf::Vector2f& mouse_position) noexcept {
+	sf::Vector2f position_offset = mouse_position - GetEventSpritePosition() - GetEventSpriteOffset();
+	event_figure_ptr_->GetFigureSprite().move(position_offset);
+}
+
+inline void BoardCanvas::SetEventFigurePositionIfEligible(const sf::Event& mouse_event) noexcept {
+	if (IsFigureOnTile(event_figure_ptr_))
+		SetEventFigurePosition(mouse_event);
+}
+
+inline void BoardCanvas::SetEventFigurePosition(const sf::Event& mouse_event) noexcept {
+	ManageMovingEventFigureIfEligible(GetMouseButtonBoardCoordinates(mouse_event));
+	RefreshEventFigureSpritePosition();
+}
+
+inline void BoardCanvas::ManageMovingEventFigureIfEligible(const BoardCoordinates coordinates) noexcept {
+	if (IsEventFigureMovable(coordinates))
+		ManageMovingEventFigure(coordinates);
+}
+
+inline void BoardCanvas::ManageMovingEventFigure(const BoardCoordinates coordinates) noexcept {
+	if (!chess_engine_.CheckIfPontifexMaximus(coordinates))
+		MoveEventFigure(coordinates);
+	else
+		InitializeRomanChessFigures();
+}
+
+inline void BoardCanvas::MoveEventFigure(const BoardCoordinates coordinates) noexcept {
+	chess_engine_.CheckIfConsul(coordinates);
+
+	chess_engine_.MoveFigure(event_figure_ptr_->GetPosition(), coordinates);
+	SetFigurePtrToEventPtr(coordinates);
+	ResetOldEventFigurePosition();
+	SetEventFigureCoordinates(coordinates);
+
+	SetMoveMadeBoolean();
+}
+
+inline void BoardCanvas::ResetOldEventFigurePosition() noexcept {
+	figures_[event_figure_ptr_->GetPosition().y][event_figure_ptr_->GetPosition().x] = nullptr;
+}
+
+inline void BoardCanvas::SetEventFigureCoordinates(const BoardCoordinates coordinates) noexcept {
+	event_figure_ptr_->SetPosition(coordinates);
+}
+
+inline void BoardCanvas::RefreshEventFigureSpritePosition() noexcept {
+	event_figure_ptr_->SetFigureSpritePosition();
+}
+
+inline void BoardCanvas::SetFigurePtrToEventPtr(const BoardCoordinates coordinates) noexcept {
+	figures_[coordinates.y][coordinates.x] = event_figure_ptr_;
+}
+
+#pragma endregion
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*											  RECTANGLE FUNCTIONS                                              */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region RECTANGLE FUNCTIONS
+
+void BoardCanvas::SetRectangleCoordinates() noexcept {
+	chess_engine_.CalculateLegalMoves(event_figure_ptr_);
+	auto var = chess_engine_.GetLegalMoves();
+	for (const auto& coordinate : chess_engine_.GetLegalMoves())
 		EmplaceRectangleCoordinate(coordinate);
-	}
 }
 
-inline void BoardCanvas::EmplaceRectangleCoordinate(const BoardCoordinates& coordinate) {
-	if (IsFigureOnTile(coordinate)) {
+inline void BoardCanvas::EmplaceRectangleCoordinate(const BoardCoordinates coordinate) noexcept {
+	if (IsFigureOnTile(coordinate))
 		red_rectangle_positions_.emplace_back(coordinate);
-	}
-	else {
+
+	else 
 		yellow_rectangle_positions_.emplace_back(coordinate);
-	}
 }
 
-inline void BoardCanvas::ResetRectangleCoordinates() {
+inline void BoardCanvas::ResetRectangleCoordinates() noexcept {
 	DisableDrawingRectangles();
 	ClearRectangleVectors();
 }
 
-inline void BoardCanvas::ClearRectangleVectors() {
+inline void BoardCanvas::ClearRectangleVectors() noexcept {
 	yellow_rectangle_positions_.clear();
 	red_rectangle_positions_.clear();
 }
 
-inline bool BoardCanvas::IsOnCanvas(const int x_coordinate, const int y_coordinate) const {
-	return (x_coordinate < Constants::boardSize) && (y_coordinate < Constants::boardSize)
-		&& (x_coordinate >= 0)					 && (y_coordinate >= 0);
+inline void BoardCanvas::EnableDrawingRectangles() noexcept {
+	is_drawing_rectangles_enabled_ = true;
 }
 
-inline bool BoardCanvas::IsOnCanvas(sf::Vector2f coordinates) const {
-	int x_coordinate = static_cast<int>(std::round(coordinates.x)) / Constants::PixelMultiplier;
-	int y_coordinate = static_cast<int>(std::round(coordinates.y)) / Constants::PixelMultiplier;
-
-	return IsOnCanvas(x_coordinate, y_coordinate);
+inline void BoardCanvas::DisableDrawingRectangles() noexcept {
+	is_drawing_rectangles_enabled_ = false;
 }
 
-void BoardCanvas::MoveEventSprite(const sf::Vector2f& mouse_position) {
-	if (IsFigureOnTile(event_figure_ptr_)) {
-		sf::Vector2f position_offset = mouse_position - GetEventSpritePosition() - GetEventSpriteOffset();
-		event_figure_ptr_->GetFigureSprite().move(position_offset);
-	}
+inline bool BoardCanvas::GameIsNotOver() const noexcept {
+	return !chess_engine_.IsGameOver();
 }
 
-inline const sf::Vector2f BoardCanvas::GetEventSpritePosition() const {
+#pragma endregion
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*											  BOOLEAN FUNCTIONS                                                */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region BOOLEAN FUNCTIONS
+
+inline bool BoardCanvas::IsFigureOnTile(BoardCoordinates coordinates) const noexcept {
+	return figures_[coordinates.y][coordinates.x] != nullptr;
+}
+
+inline bool BoardCanvas::IsFigureOnTile(const std::shared_ptr<Figure>& figure) const noexcept {
+	return figure != nullptr;
+}
+
+inline bool BoardCanvas::IsEventFigureEqualToSelectedFigure(const BoardCoordinates coordinates) const noexcept {
+	return figures_[coordinates.y][coordinates.x] == event_figure_ptr_;
+}
+
+inline bool BoardCanvas::IsEventFigureMoveLegal(const BoardCoordinates coordinates) const noexcept {
+	return chess_engine_.IsMoveLegal(coordinates);
+}
+
+bool BoardCanvas::IsEventFigureMovable(const BoardCoordinates board_coordinates) const noexcept {
+	if (IsOnCanvas(board_coordinates))
+		return !IsEventFigureEqualToSelectedFigure(board_coordinates) && 
+				IsEventFigureRightColour() && 
+				IsEventFigureMoveLegal(board_coordinates);
+	else
+		return false;
+}
+
+inline bool BoardCanvas::IsEventFigureRightColour() const noexcept {
+	if (IsFigureOnTile(event_figure_ptr_))
+		return IsEventFigureColourEqualToCurrentPlayerColour();
+	else
+		return false;
+}
+
+inline bool BoardCanvas::IsEventFigureColourEqualToCurrentPlayerColour() const noexcept {
+	return event_figure_ptr_->GetFigureColour() == chess_engine_.GetPlayerTurn();
+}
+
+inline bool BoardCanvas::IsOnCanvas(const BoardCoordinates coordinates) const noexcept {
+	return (coordinates.x < Constants::boardSize) && (coordinates.y < Constants::boardSize)
+		&& (coordinates.x >= 0)					  && (coordinates.y >= 0);
+}
+
+inline bool BoardCanvas::IsOnCanvas(sf::Vector2f coordinates) const noexcept {
+	return IsOnCanvas(GetBoardCoordinatesFromSfVector(coordinates));
+}
+
+#pragma endregion
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*												  GETTERS                                                      */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region GETTERS
+
+BoardCoordinates BoardCanvas::GetBoardCoordinatesFromSfVector(const sf::Vector2f coordinates) const noexcept {
+	return BoardCoordinates(static_cast<int8>(std::round(coordinates.x) / Constants::PixelMultiplier_float),
+							static_cast<int8>(std::round(coordinates.y) / Constants::PixelMultiplier_float));
+}
+
+inline sf::Vector2f BoardCanvas::GetSfVectorFromBoardCoordinates(const BoardCoordinates coordinates) const noexcept {
+	return sf::Vector2f(static_cast<float>(coordinates.x) * Constants::PixelMultiplier_float,
+						static_cast<float>(coordinates.y) * Constants::PixelMultiplier_float);
+}
+
+inline sf::Vector2f BoardCanvas::GetMouseButtonVectorCoordinates(const sf::Event& mouse_event) const noexcept {
+	return sf::Vector2f(static_cast<float>(mouse_event.mouseButton.x),
+						static_cast<float>(mouse_event.mouseButton.y));
+}
+
+sf::Vector2f BoardCanvas::GetMouseMoveVectorCoordinates(const sf::Event& mouse_event) const noexcept {
+	return sf::Vector2f(static_cast<float>(mouse_event.mouseMove.x),
+						static_cast<float>(mouse_event.mouseMove.y));
+}
+
+inline BoardCoordinates BoardCanvas::GetMouseButtonBoardCoordinates(const sf::Event& mouse_event) const noexcept {
+	return BoardCoordinates(static_cast<int8>(static_cast<int16>(mouse_event.mouseButton.x) / Constants::PixelMultiplier),
+							static_cast<int8>(static_cast<int16>(mouse_event.mouseButton.y) / Constants::PixelMultiplier));
+}
+
+inline BoardCoordinates BoardCanvas::GetMouseMoveBoardCoordinates(const sf::Event& mouse_event) const noexcept {
+	return BoardCoordinates(static_cast<int8>(static_cast<int16>(mouse_event.mouseMove.x) / Constants::PixelMultiplier),
+							static_cast<int8>(static_cast<int16>(mouse_event.mouseMove.y) / Constants::PixelMultiplier));
+}
+
+inline const sf::Vector2f BoardCanvas::GetEventSpritePosition() const noexcept {
+	auto var = event_figure_ptr_->GetFigureSprite().getPosition();
 	return event_figure_ptr_->GetFigureSprite().getPosition();
 }
 
-inline const sf::Vector2f BoardCanvas::GetEventSpriteOffset() const {
+inline const sf::Vector2f BoardCanvas::GetEventSpriteOffset() const noexcept {
 	return event_figure_offset_;
 }
 
-void BoardCanvas::SetEventFigurePosition(sf::Event& mouse_event) {
-    if (IsFigureOnTile(event_figure_ptr_)) {
-		auto mouse_coordinates = GetMouseIntegerCoordinates(std::make_pair(mouse_event.mouseButton.x,
-																		   mouse_event.mouseButton.y));
-		
-		MoveEventFigure(mouse_coordinates.first, mouse_coordinates.second);
+#pragma endregion
 
-		chess_engine_.CheckGameOver();
-		if (chess_engine_.IsGameOver()) {
-			DisplayGameOverMessageBox();
-		}
-		RefreshEventFigureSpritePosition();
-    }
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*												MISCELLANEOUS                                                  */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+#pragma region MISCELLANEOUS
+
+inline void BoardCanvas::EnableDragging() noexcept {
+	is_dragging_enabled_ = true;
 }
 
-void BoardCanvas::MoveEventFigure(const int x_coordinate, const int y_coordinate) {
-	if (IsEventMovable(x_coordinate, y_coordinate)) {
-		if (!chess_engine_.CheckIfPontifexMaximus(BoardCoordinates(x_coordinate, y_coordinate))) {
-			chess_engine_.CheckIfConsul(BoardCoordinates(x_coordinate, y_coordinate));
-			chess_engine_.MoveFigure(event_figure_ptr_->GetPosition(), BoardCoordinates(x_coordinate, y_coordinate));
-			SetFigurePtr(x_coordinate, y_coordinate);
-			ResetOldEventFigurePosition();
-			SetEventFigureCoordinates(x_coordinate, y_coordinate);
-		}
-		else {
-			InitializeRomanChessFigures();
-		}
-		chess_engine_.SaveBoardImageToDeque();
-		chess_engine_.NextPlayerTurn();
-	}
+inline void BoardCanvas::DisableDragging() noexcept {
+	is_dragging_enabled_ = false;
 }
 
-inline void BoardCanvas::SetFigurePtr(const int x_coordinate, const int y_coordinate) {
-	figures_[y_coordinate][x_coordinate] = event_figure_ptr_;
+inline void BoardCanvas::ManageEndOfMove() noexcept {
+	chess_engine_.SaveBoardImageToDeque();
+	chess_engine_.NextPlayerTurn();
+	ResetMoveMadeBoolean();
 }
 
-inline void BoardCanvas::ResetOldEventFigurePosition() {
-	figures_[event_figure_ptr_->GetPosition().y][event_figure_ptr_->GetPosition().x] = nullptr;
+inline void BoardCanvas::SetMoveMadeBoolean() noexcept {
+	is_move_made_ = true;
 }
 
-inline void BoardCanvas::SetEventFigureCoordinates(const int x_coordinate, const int y_coordinate) {
-	event_figure_ptr_->SetPosition(x_coordinate, y_coordinate);
+inline void BoardCanvas::ResetMoveMadeBoolean() noexcept {
+	is_move_made_ = false;
 }
 
-inline void BoardCanvas::RefreshEventFigureSpritePosition() {
-	event_figure_ptr_->SetFigureSpritePosition();
+inline void BoardCanvas::ResetTemporaryValues() noexcept {
+	ResetEventFigurePtr();
+	ResetEventFigureSpriteOffset();
+	ResetRectangleCoordinates();
 }
 
-inline sf::Vector2f BoardCanvas::GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const {
-	return sf::Vector2f(static_cast<float>(x_coordinate), static_cast<float>(y_coordinate));
+void BoardCanvas::ManageEndOfGameIfGameIsOver() noexcept {
+	chess_engine_.CheckGameOver();
+	if (chess_engine_.IsGameOver()) 
+		DisplayGameOverMessageBox();
 }
 
-std::pair<int, int> BoardCanvas::GetMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const {
-	std::pair<int, int> result;
-	result.first = mouse_coordinates.first / Constants::PixelMultiplier;
-	result.second = mouse_coordinates.second / Constants::PixelMultiplier;
-
-	return result;
-}
-
-std::pair<int, int> BoardCanvas::GetOffsettedMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const {
-	std::pair<int, int> result;
-	result.first = (mouse_coordinates.first - static_cast<int>(event_figure_offset_.x)) / Constants::PixelMultiplier;
-	result.second = (mouse_coordinates.second - static_cast<int>(event_figure_offset_.x)) / Constants::PixelMultiplier;
-
-	return result;
-}
-
-
-
-inline void BoardCanvas::DisplayGameOverMessageBox() {
+inline void BoardCanvas::DisplayGameOverMessageBox() noexcept {
 	chess_engine_.GetPlayerTurn() == figureColour::Purple ? wxMessageBox(wxConstantStrings::GameOverWinnerRedMessage) :
 		wxMessageBox(wxConstantStrings::GameOverWinnerPurpleMessage);
 }
 
-
-inline bool BoardCanvas::IsFigureOnTile(const BoardCoordinates& coordinates) const {
-	return figures_[coordinates.y][coordinates.x] != nullptr;
-}
-
-inline bool BoardCanvas::IsFigureOnTile(const std::shared_ptr<Figure>& figure) const {
-	return figure != nullptr;
-}
-
-
-inline bool BoardCanvas::IsEventFigure(const int x_coordinate, const int y_coordinate) const {
-	return figures_[y_coordinate][x_coordinate] == event_figure_ptr_;
-}
-
-inline bool BoardCanvas::IsEventMoveLegal(const int x_coordinate, const int y_coordinate) const {
-	return chess_engine_.IsMoveLegal(BoardCoordinates(x_coordinate, y_coordinate));
-}
-
-bool BoardCanvas::IsEventMovable(const int x_coordinate, const int y_coordinate) const {
-	if (IsOnCanvas(x_coordinate, y_coordinate)) {
-		return !IsEventFigure(x_coordinate, y_coordinate) &&
-				IsEventFigureRightColour() &&
-				IsEventMoveLegal(x_coordinate, y_coordinate);
-	}
-	return false;
-}
-
-inline bool BoardCanvas::IsEventFigureRightColour() const {
-	if (IsFigureOnTile(event_figure_ptr_)) {
-		return event_figure_ptr_->GetFigureColour() ==chess_engine_.GetPlayerTurn();
-	}
-	return false;
-}
-
-
+#pragma endregion

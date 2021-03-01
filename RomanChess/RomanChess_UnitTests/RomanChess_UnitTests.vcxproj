@@ -147,15 +147,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ConsulTest.cpp" />
-    <ClCompile Include="EquesTest.cpp" />
-    <ClCompile Include="HastatusTest.cpp" />
-    <ClCompile Include="PontifexMaximusTest.cpp" />
-    <ClCompile Include="PrincepsTest.cpp" />
     <ClCompile Include="RomanChessAITestcpp.cpp" />
+    <ClCompile Include="RomanChessGameEngineTest.cpp" />
     <ClCompile Include="RomanChess_UnitTests.cpp" />
-    <ClCompile Include="TriariusTest.cpp" />
-    <ClCompile Include="VelesTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GTestLib\GTestLib.vcxproj">

@@ -1,17 +1,19 @@
 #pragma once
+#include "TypeAliases.h"
+
 struct BoardCoordinates
 {
-	int x;
-	int y;
+	int8 x;
+	int8 y;
 	
-	BoardCoordinates() : x{0}, y{0} {}
-	BoardCoordinates(int x_variable, int y_variable) : x{x_variable}, y{y_variable} {}
+	constexpr BoardCoordinates(const int8 input_x = 0, const int8 input_y = 0) :
+		x{ input_x }, y{ input_y } {}
 
-	friend BoardCoordinates operator+(const BoardCoordinates& left, const BoardCoordinates& right) {
+	friend BoardCoordinates operator+(const BoardCoordinates left, const BoardCoordinates right) {
 		return BoardCoordinates(left.x + right.x, left.y + right.y);
 	}
 
-	bool operator==(const BoardCoordinates& right) const {
+	bool operator==(const BoardCoordinates right) const {
 		return (x == right.x) && (y == right.y);
 	}
 };

@@ -1,105 +1,18 @@
 #pragma once
-#include <utility>
-#include <memory>
-#include <array>
-#include <vector>
-#include <algorithm>
-#include <functional>
-#include <optional>
-#include <cmath>
-#include "Constants.h"
-#include "ID.h"
-#include "BoardCoordinates.h"
-#include "BadColourException.h"
 #include <SFML/Graphics.hpp>
 
-using FigureImage = std::pair<figureType, figureColour>;
-using BoardImage = std::array<std::array<FigureImage, Constants::boardSize>, Constants::boardSize>;
-using ConditionLambdaType = std::function<bool(const BoardImage& board_layout, const BoardCoordinates& position)>;
-using MoveFigureLambdaType = std::function<const BoardCoordinates(const int number_of_spaces)>;
+#include "ID.h"
+#include "Constants.h"
+#include "BoardCoordinates.h"
+#include "FigureImage.h"
 
 class Figure
 {
 public:
-	//Getters
 
-	const FigureImage& GetFigureImage() const {
-		return figure_image_;
-	}
-
-	const BoardCoordinates& GetPosition() const {
-		return position_;
-	}
-
-	const figureType& GetType() const {
-		return figure_image_.first;
-	}
-
-	const figureColour& GetFigureColour() const {
-		return figure_image_.second;
-	}
-
-	sf::Sprite& GetFigureSprite() {
-		return figure_sprite_;
-	}
-
-
-
-	//Setters
-	void SetPosition(const BoardCoordinates& new_poistion) {
-		position_ = new_poistion;
-	}
-
-	void SetPosition(const int x_coordinate, const int y_coordinate) {
-		SetPosition(BoardCoordinates(x_coordinate, y_coordinate));
-	}
-
-	void SetScaledPosition(const sf::Vector2f& new_position) {
-		SetPosition(BoardCoordinates(static_cast<int>(std::round(new_position.x) / Constants::PixelMultiplier), 
-									 static_cast<int>(std::round(new_position.y) / Constants::PixelMultiplier)));
-	}
-
-	void SetFigureType(const figureType& figure_type) {
-		figure_image_.first = figure_type;
-	}
-
-	void SetFigureColour(const figureColour& figure_colour) {
-		figure_image_.second = figure_colour;
-	}
-
-
-
-	const FigureImage GetEmptyFigure() const {
-		return FigureImage(figureType::no_type, figureColour::no_colour);
-	}
-
-	bool IsRed(const FigureImage& figure_image) const {
-		return figure_image.second == figureColour::Red;
-	}
-
-	bool IsPurple(const FigureImage& figure_image) const {
-		return figure_image.second == figureColour::Purple;
-	}
-
-	bool IsEmpty(const FigureImage& figure_image) const {
-		return figure_image == GetEmptyFigure();
-	}
-
-	bool IsFigureRed() const{
-		return IsFigureColour(figureColour::Red);
-	}
-
-	bool IsFigurePurple() const{
-		return IsFigureColour(figureColour::Purple);
-	}
-	
-	bool IsFigureColour(figureColour colour) const {
-		return colour == GetFigureColour();
-	}
-
-	bool IsFigureType(figureType type) const {
-		return type == GetType();
-	}
+	/*---------------------------------------------------------------------------------------------------------*/
+	/*												INITIALIZERS		                                       */
+	/*---------------------------------------------------------------------------------------------------------*/
 
 	void InitializeFigure(
 		figureColour figure_colour, figureType figure_type, BoardCoordinates initial_position, int figure_number) {
@@ -115,9 +28,53 @@ public:
 		figure_sprite_.setTexture(figure_texture);
 	}
 
+	/*---------------------------------------------------------------------------------------------------------*/
+	/*												GETTERS                                                    */
+	/*---------------------------------------------------------------------------------------------------------*/
+
+	[[nodiscard]] const FigureImage GetFigureImage() const noexcept {
+		return figure_image_;
+	}
+
+	[[nodiscard]] const BoardCoordinates GetPosition() const noexcept {
+		return position_;
+	}
+
+	[[nodiscard]] const figureType GetType() const noexcept {
+		return figure_image_.type;
+	}
+
+	[[nodiscard]] const figureColour GetFigureColour() const noexcept {
+		return figure_image_.colour;
+	}
+
+	[[nodiscard]] sf::Sprite& GetFigureSprite() noexcept {
+		return figure_sprite_;
+	}
+
+	/*---------------------------------------------------------------------------------------------------------*/
+	/*												SETTERS                                                    */
+	/*---------------------------------------------------------------------------------------------------------*/
+
+	void SetPosition(const BoardCoordinates new_poistion) noexcept {
+		position_ = new_poistion;
+	}
+
+	void SetPosition(const int x_coordinate, const int y_coordinate) noexcept {
+		SetPosition(BoardCoordinates(x_coordinate, y_coordinate));
+	}
+
+	void SetFigureType(const figureType& figure_type) noexcept {
+		figure_image_.type = figure_type;
+	}
+
+	void SetFigureColour(const figureColour& figure_colour) noexcept {
+		figure_image_.colour = figure_colour;
+	}
+
 	void SetFigureSpritePosition() {
 		figure_sprite_.setPosition(static_cast<float>(GetPosition().x * Constants::PixelMultiplier),
-								   static_cast<float>(GetPosition().y * Constants::PixelMultiplier));
+			static_cast<float>(GetPosition().y * Constants::PixelMultiplier));
 	}
 
 	void SetTextureRect(const std::pair<sf::Vector2i, sf::Vector2i>& figure_sprite_rect_pos) {
@@ -126,40 +83,39 @@ public:
 			figure_sprite_.setTextureRect(sf::IntRect(figure_sprite_rect_pos.second, SFMLConstants::FigureSpriteRectSize));
 	}
 
-	void SetFigureTextureRect() {
-		switch (GetType()) {
-		case figureType::Veles:
-			SetTextureRect(SFMLConstants::FigureSpriteRectPos_Veles);
-			break;
-		case figureType::Hastatus:
-			SetTextureRect(SFMLConstants::FigureSpriteRectPos_Hastatus);
-			break;
-		case figureType::Princeps:
-			SetTextureRect(SFMLConstants::FigureSpriteRectPos_Princeps);
-			break;
-		case figureType::Triarius:
-			SetTextureRect(SFMLConstants::FigureSpriteRectPos_Triarius);
-			break;
-		case figureType::Eques:
-			SetTextureRect(SFMLConstants::FigureSpriteRectPos_Eques);
-			break;
-		case figureType::Consul:
-			SetTextureRect(SFMLConstants::FigureSpriteRectPos_Consul);
-			break;
-		case figureType::PontifexMaximus:
-			SetTextureRect(SFMLConstants::FigureSpriteRectPos_PontifexMaximus);
-			break;
-		}
+	virtual void SetFigureTextureRect() = 0;
+
+	/*---------------------------------------------------------------------------------------------------------*/
+	/*												BOOLEANS                                                   */
+	/*---------------------------------------------------------------------------------------------------------*/
+
+	[[nodiscard]] bool IsRed(const FigureImage& figure_image) const {
+		return figure_image.colour == figureColour::Red;
 	}
 
+	[[nodiscard]] bool IsPurple(const FigureImage& figure_image) const {
+		return figure_image.colour == figureColour::Purple;
+	}
 
+	[[nodiscard]] bool IsEmpty(const FigureImage& figure_image) const {
+		return figure_image == FigureImage();
+	}
 
+	[[nodiscard]] bool IsFigureRed() const{
+		return figure_image_.colour == figureColour::Red;
+	}
 
-
-
-	sf::Sprite figure_sprite_;
+	[[nodiscard]] bool IsFigurePurple() const{
+		return figure_image_.colour == figureColour::Purple;
+	}
+	
+	[[nodiscard]] bool IsFigureType(figureType type) const {
+		return type == GetType();
+	}
 
 private:
+	sf::Sprite figure_sprite_;
+
 	BoardCoordinates position_;
 	FigureImage figure_image_;
 };

@@ -4,36 +4,39 @@
 #include <array>
 #include <map>
 #include <set>
+#include <limits>
 #include "ID.h"
 #include <SFML/Graphics.hpp>
-
-using FigureImage = std::pair<figureType, figureColour>;
+#include "BoardCoordinates.h"
+#include "FigureImage.h"
+#include "TypeAliases.h"
 
 
 namespace Constants {
-	constexpr int boardSize = 8;
-	constexpr int lastBoardElement = boardSize - 1;
-	constexpr std::size_t dequeMovesNumber = std::size_t(20);
-	constexpr int PixelMultiplier = 100;
-	constexpr int hastatusMaxMovesFront = 2;
-	constexpr int equesJump = 2;
+	constexpr const int8 boardSize = int8(8);
+	constexpr const int8 lastBoardElement = boardSize - int8(1);
+	constexpr const std::size_t dequeMovesNumber = std::size_t(20);
+	constexpr const int16 PixelMultiplier = int16(100);
+	constexpr const float PixelMultiplier_float = static_cast<float>(PixelMultiplier);
+	constexpr const int8 hastatusMaxMovesFront = int8(2);
+	constexpr const int8 equesJump = int8(2);
 
 #pragma region FIGURE_IMAGES
-	constexpr FigureImage VelesImage_red			  { figureType::Veles,			 figureColour::Red		 };
-	constexpr FigureImage VelesImage_purple			  { figureType::Veles,			 figureColour::Purple	 };
-	constexpr FigureImage HastatusImage_red			  { figureType::Hastatus,		 figureColour::Red		 };
-	constexpr FigureImage HastatusImage_purple		  { figureType::Hastatus,		 figureColour::Purple	 };
-	constexpr FigureImage PrincepsImage_red			  { figureType::Princeps,		 figureColour::Red		 };
-	constexpr FigureImage PrincepsImage_purple		  { figureType::Princeps,		 figureColour::Purple	 };
-	constexpr FigureImage TriariusImage_red			  { figureType::Triarius,		 figureColour::Red		 };
-	constexpr FigureImage TriariusImage_purple		  { figureType::Triarius,		 figureColour::Purple	 };
-	constexpr FigureImage EquesImage_red			  { figureType::Eques,			 figureColour::Red		 };
-	constexpr FigureImage EquesImage_purple			  { figureType::Eques,			 figureColour::Purple	 };
-	constexpr FigureImage ConsulImage_red			  { figureType::Consul,			 figureColour::Red		 };
-	constexpr FigureImage ConsulImage_purple		  { figureType::Consul,			 figureColour::Purple	 };
-	constexpr FigureImage PontifexMaximusImage_red	  { figureType::PontifexMaximus, figureColour::Red		 };
-	constexpr FigureImage PontifexMaximusImage_purple { figureType::PontifexMaximus, figureColour::Purple	 };
-	constexpr FigureImage EmptyFigureImage			  { figureType::no_type,		 figureColour::no_colour };
+	constexpr FigureImage VelesImage_red				{ figureType::Veles,			figureColour::Red		};
+	constexpr FigureImage VelesImage_purple				{ figureType::Veles,			figureColour::Purple	};
+	constexpr FigureImage HastatusImage_red				{ figureType::Hastatus,			figureColour::Red		};
+	constexpr FigureImage HastatusImage_purple			{ figureType::Hastatus,			figureColour::Purple	};
+	constexpr FigureImage PrincepsImage_red				{ figureType::Princeps,			figureColour::Red		};
+	constexpr FigureImage PrincepsImage_purple			{ figureType::Princeps,			figureColour::Purple	};
+	constexpr FigureImage TriariusImage_red				{ figureType::Triarius,			figureColour::Red		};
+	constexpr FigureImage TriariusImage_purple			{ figureType::Triarius,			figureColour::Purple	};
+	constexpr FigureImage EquesImage_red				{ figureType::Eques,			figureColour::Red		};
+	constexpr FigureImage EquesImage_purple				{ figureType::Eques,			figureColour::Purple	};
+	constexpr FigureImage ConsulImage_red				{ figureType::Consul,			figureColour::Red		};
+	constexpr FigureImage ConsulImage_purple			{ figureType::Consul,			figureColour::Purple	};
+	constexpr FigureImage PontifexMaximusImage_red		{ figureType::PontifexMaximus,	figureColour::Red		};
+	constexpr FigureImage PontifexMaximusImage_purple	{ figureType::PontifexMaximus,	figureColour::Purple	};
+	constexpr FigureImage EmptyFigureImage				{ figureType::no_type,			figureColour::no_colour	};
 
 	
 	static std::set<FigureImage> AllFigureImages = {
@@ -72,14 +75,25 @@ namespace Constants {
 
 	namespace AI {
 
-		constexpr int MaxDepth = 5;
-		constexpr int MaxValue =  1000000;
-		constexpr int MinValue = -1000000;
+		constexpr const int8 MaxDepth = int8(5);
+		constexpr const int16 MaxValue = std::numeric_limits<int16>::max();
+		constexpr const int16 MinValue = std::numeric_limits<int16>::min();
+
+		constexpr const BoardCoordinates EmptyBoardCoordinates = BoardCoordinates();
+
+
+
+
+		//deprecate node value
+		//inline const NodeValue InitialAlpha = { EmptyMove, MinValue };
+		//inline const NodeValue InitialBeta = {EmptyMove, MaxValue};
+
+		//inline const std::pair <NodeValue, NodeValue> InitialAlphaBeta(InitialAlpha, InitialBeta);
 
 		namespace FigureEvaluation {
 
 			//Plays balanced
-			static std::map<FigureImage, int> CaesarAIFiguresMap = {
+			static std::map<FigureImage, int16> CaesarAIFiguresMap = {
 				std::make_pair(VelesImage_red,			    -3),
 				std::make_pair(VelesImage_purple,			 3),
 				std::make_pair(HastatusImage_red,			-5),
@@ -97,7 +111,7 @@ namespace Constants {
 			};
 
 			//Plays defensive
-			static std::map<FigureImage, int> AgrippaAIFiguresMap = {
+			static std::map<FigureImage, int16> AgrippaAIFiguresMap = {
 				std::make_pair(VelesImage_red,				-3),
 				std::make_pair(VelesImage_purple,			 6),
 				std::make_pair(HastatusImage_red,			-5),
@@ -115,7 +129,7 @@ namespace Constants {
 			};
 
 			//Plays offensive
-			static std::map<FigureImage, int> ScipioAIFiguresMap = {
+			static std::map<FigureImage, int16> ScipioAIFiguresMap = {
 				std::make_pair(VelesImage_red,				-3),
 				std::make_pair(VelesImage_purple,			 1),
 				std::make_pair(HastatusImage_red,			-6),
@@ -133,7 +147,7 @@ namespace Constants {
 			};
 
 			//Plays super defensive
-			static std::map<FigureImage, int> CrassusAIFiguresMap = {
+			static std::map<FigureImage, int16> CrassusAIFiguresMap = {
 				std::make_pair(VelesImage_red,				  0),
 				std::make_pair(VelesImage_purple,			  4),
 				std::make_pair(HastatusImage_red,			  0),
@@ -151,7 +165,7 @@ namespace Constants {
 			};
 
 			//Plays super offensive
-			static std::map<FigureImage, int> VarroAIFiguresMap = {
+			static std::map<FigureImage, int16> VarroAIFiguresMap = {
 				std::make_pair(VelesImage_red,				-5),
 				std::make_pair(VelesImage_purple,			 0),
 				std::make_pair(HastatusImage_red,			-8),
@@ -171,7 +185,7 @@ namespace Constants {
 		}
 
 		namespace EvaluationMultiplier {
-			using IntegerMap2D = std::array<std::array<int, Constants::boardSize>, Constants::boardSize>;
+			using IntegerMap2D = std::array<std::array<int16, Constants::boardSize>, Constants::boardSize>;
 
 			//Using Red perspective, Purple starts reading from IntegerMap2D[7][0]
 
@@ -337,44 +351,50 @@ namespace Constants {
 }
 
 namespace ImagePaths {
-	inline const std::string Board =			"images/Board.PNG";
-	inline const std::string Figures =			"images/Figures.PNG";
-	inline const std::string Yellow_Rectangle = "images/Yellow_Rectangle.PNG";
-	inline const std::string Red_Rectangle =	"images/Red_Rectangle.PNG";
+	using namespace std::string_literals;
 
+	inline const std::string Board =			"images/Board.PNG"s;
+	inline const std::string Figures =			"images/Figures.PNG"s;
+	inline const std::string Yellow_Rectangle = "images/Yellow_Rectangle.PNG"s;
+	inline const std::string Red_Rectangle =	"images/Red_Rectangle.PNG"s;
 }
 
-
 namespace SFMLConstants {
+	using RectanglePosition = const std::pair<sf::Vector2i, sf::Vector2i>;
+
 	const sf::Vector2i FigureSpriteRectSize(100, 100);
 
-	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Veles			(sf::Vector2(0,	  0), sf::Vector2(0,   100));
-	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Hastatus		(sf::Vector2(100, 0), sf::Vector2(100, 100));
-	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Princeps		(sf::Vector2(200, 0), sf::Vector2(200, 100));
-	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Triarius		(sf::Vector2(300, 0), sf::Vector2(300, 100));
-	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Eques			(sf::Vector2(400, 0), sf::Vector2(400, 100));
-	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_Consul			(sf::Vector2(500, 0), sf::Vector2(500, 100));
-	const std::pair<sf::Vector2i, sf::Vector2i> FigureSpriteRectPos_PontifexMaximus (sf::Vector2(600, 0), sf::Vector2(600, 100));
+	const RectanglePosition FigureSpriteRectPos_Veles			(sf::Vector2f(0,   0), sf::Vector2f(0,   100));
+	const RectanglePosition FigureSpriteRectPos_Hastatus		(sf::Vector2f(100, 0), sf::Vector2f(100, 100));
+	const RectanglePosition FigureSpriteRectPos_Princeps		(sf::Vector2f(200, 0), sf::Vector2f(200, 100));
+	const RectanglePosition FigureSpriteRectPos_Triarius		(sf::Vector2f(300, 0), sf::Vector2f(300, 100));
+	const RectanglePosition FigureSpriteRectPos_Eques			(sf::Vector2f(400, 0), sf::Vector2f(400, 100));
+	const RectanglePosition FigureSpriteRectPos_Consul			(sf::Vector2f(500, 0), sf::Vector2f(500, 100));
+	const RectanglePosition FigureSpriteRectPos_PontifexMaximus (sf::Vector2f(600, 0), sf::Vector2f(600, 100));
 }
 
 
 namespace ExceptionMessages {
-	inline const std::string IsPlaceInFrontEmptyPurple =		"IsPlaceInFrontEmptyPurple()";
-	inline const std::string IsEnemyOnDiagonalLeftPurple =		"IsEnemyOnDiagonalLeftPurple()";
-	inline const std::string IsEnemyOnDiagonalRightPurple =		"IsEnemyOnDiagonalRightPurple()";
-	inline const std::string IsPlaceInFrontEmptyRed =			"IsPlaceInFrontEmptyRed()";
-	inline const std::string IsEnemyOnDiagonalLeftRed =			"IsEnemyOnDiagonalLeftRed()";
-	inline const std::string IsEnemyOnDiagonalRightRed =		"IsEnemyOnDiagonalRightRed()";
+	using namespace std::string_literals;
 
-	inline const std::string VelesGetLegalMovesRed =			"VelesGetLegalMovesRed()";
-	inline const std::string VelesGetLegalMovesPurple =			"VelesGetLegalMovesPurple()";
-	inline const std::string HastatusGetLegalMovesRed =			"HastatusGetLegalMovesRed()";
-	inline const std::string HastatusGetLegalMovesPurple =		"HastatusGetLegalMovesPurple()";
-	inline const std::string PrincepsGetLegalMovesRed =			"PrincepsGetLegalMovesRed()";
-	inline const std::string PrincepsGetLegalMovesPurple =		"PrincepsGetLegalMovesPurple()";
-	inline const std::string TriariusGetLegalMovesRed =			"TriariusGetLegalMovesRed()";
-	inline const std::string TriariusGetLegalMovesPurple =		"TriariusGetLegalMovesPurple()";
-	inline const std::string EquesGetLegalMovesRed =			"EquesGetLegalMovesRed()";
-	inline const std::string EquesGetLegalMovesPurple =			"EquesGetLegalMovesPurple()";
+	inline const std::string ValidateIfEnemy
+								= "Bad input in RomanChessEngine::ValidateIfEnemy"s;
+
+	inline const std::string InitializeFigureEvaluationValuesMap 
+								= "Bad input in RomanChessAI::InitializeFigureEvaluationValuesMap"s;
+
+	inline const std::string InitializeFigureEvaluationMultiplierMap
+								= "Bad input in RomanChessAI::InitializeFigureEvaluationMultiplierMap"s;
+
+	inline const std::string SetFigureEvaluationMap
+								= "Bad input in RomanChessAI::SetFigureEvaluationMap"s;
+
+	inline const std::string SetFigureEvaluationMultiplierMap
+								= "Bad input in RomanChessAI::SetFigureEvaluationMultiplierMap"s;
+
+	inline const std::string GetFigureEvaluationMultiplier
+								= "Bad input in RomanChessAI::GetFigureEvaluationMultiplier"s;
+
+
 }
 

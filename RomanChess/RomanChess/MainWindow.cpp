@@ -208,5 +208,5 @@ void MainWindow::MakeNewGame() {
 	wxPoint board_canvas_point{ wxConstants::BoardCanvasPoint };
 	wxSize board_canvas_size{ wxConstants::BoardCanvasSize };
 
-    game_ = std::make_shared<BoardCanvas>(this, Canvas::ID::BOARD_CANVAS, board_canvas_point, board_canvas_size, 0);
+    game_ = std::make_unique<BoardCanvas>(this, Canvas::ID::BOARD_CANVAS, board_canvas_point, board_canvas_size, 0);
 }

@@ -70,9 +70,8 @@ public:
 private:
 
     bool is_game_saved_ = true;
-    std::shared_ptr<BoardCanvas> game_;
+    std::unique_ptr<BoardCanvas> game_;
 
-    //Smart pointers are not supported by wxWidgets
     //Memory will be freed by wxWidgets framework automatically after closing window
     wxMenuBar* menu_bar_ = nullptr;
 

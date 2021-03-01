@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BadColourException.h" />
+    <ClInclude Include="BadInputException.h" />
     <ClInclude Include="BoardCanvas.h" />
     <ClInclude Include="BoardCoordinates.h" />
     <ClInclude Include="ChessApp.h" />
@@ -27,6 +27,7 @@
     <ClInclude Include="Consul.h" />
     <ClInclude Include="Eques.h" />
     <ClInclude Include="Figure.h" />
+    <ClInclude Include="FigureImage.h" />
     <ClInclude Include="FigureIncludes.h" />
     <ClInclude Include="Hastatus.h" />
     <ClInclude Include="ID.h" />
@@ -37,24 +38,17 @@
     <ClInclude Include="RomanChessGameEngine.h" />
     <ClInclude Include="RomanChessNode.h" />
     <ClInclude Include="Triarius.h" />
+    <ClInclude Include="TypeAliases.h" />
     <ClInclude Include="Veles.h" />
     <ClInclude Include="wxConstants.h" />
     <ClInclude Include="wxID.h" />
     <ClInclude Include="wxSfmlCanvas.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BadColourException.cpp" />
     <ClCompile Include="BoardCanvas.cpp" />
     <ClCompile Include="ChessApp.cpp" />
-    <ClCompile Include="Consul.cpp" />
-    <ClCompile Include="Eques.cpp" />
-    <ClCompile Include="Hastatus.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="PontifexMaximus.cpp" />
-    <ClCompile Include="Princeps.cpp" />
     <ClCompile Include="RomanChessAI.cpp" />
-    <ClCompile Include="Triarius.cpp" />
-    <ClCompile Include="Veles.cpp" />
     <ClCompile Include="wxSfmlCanvas.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -79,7 +73,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>

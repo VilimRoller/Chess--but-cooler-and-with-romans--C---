@@ -2,60 +2,91 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include "TypeAliases.h"
 #include "BoardCoordinates.h"
 
-using RomanChessMove = std::pair<BoardCoordinates, BoardCoordinates>;
-using NodeValue = std::pair<RomanChessMove, int>;
-
+//deprecate node value
+//replace with moves vector
 class RomanChessNode
 {
 public:
-	RomanChessNode(const NodeValue& node_value, const int node_depth = 1)
-		: node_value_{ node_value }, depth_{ node_depth } {
+	RomanChessNode(const std::vector<BoardCoordinates>& moves,
+		const int16& evaluation_value,
+		const int8 node_depth = 1)
+		: moves_from_initial_node_{ moves }, board_evaluation_value_{evaluation_value}, depth_{ node_depth } {}
 
-	}
+	RomanChessNode(std::vector<BoardCoordinates>&& moves,
+		const int16& evaluation_value,
+		const int8 node_depth = 1)
+		: moves_from_initial_node_{ moves }, board_evaluation_value_{ evaluation_value }, depth_{ node_depth } {}
+
 	~RomanChessNode() {}
 
-	const NodeValue& GetNodeValue() const {
-		return node_value_;
-	}
+	/*-----------------------------------------------------------------------------------------------------*/
+	/*											GETTERS													   */
+	/*-----------------------------------------------------------------------------------------------------*/
 
-	const int GetNodeStrenght() const {
-		return node_value_.second;
-	}
-
-	const BoardCoordinates& GetMoveCoordinates() const {
-		return node_value_.first.second;
-	}
-
-	const int GetDepth() const {
+	const int8 GetDepth() const {
 		return depth_;
 	}
 
+	const int16 GetBoardEvaluationValue() const {
+		return board_evaluation_value_;
+	}
+
+	const BoardCoordinates GetInitialFigurePositionCoordinates() const {
+		return *moves_from_initial_node_.begin();
+	}
+
+	const BoardCoordinates GetFigurePositionCoordinates() const {
+		return *moves_from_initial_node_.end();
+	}
+
+	const auto& GetMovesVector() const {
+		return moves_from_initial_node_;
+	}
+
 	const std::size_t GetChildrenNodesNumber() const {
-		return children_nodes_.size();
+		return children_node_ptrs_.size();
 	}
 
-	auto* GetChildrenNodesPtr() const {
-		return &children_nodes_;
+	const auto& GetChildrenNodesVector() const {
+		return children_node_ptrs_;
 	}
 
-	void MakeChildrenNode(const NodeValue& node_value) {
-		children_nodes_.emplace_back(std::make_shared<RomanChessNode>(node_value, depth_ + 1));
+	/*-----------------------------------------------------------------------------------------------------*/
+	/*											SETTERS													   */
+	/*-----------------------------------------------------------------------------------------------------*/
+
+	void SetBoardEvaluationValue(const int16 evaluation_value) {
+		board_evaluation_value_ = evaluation_value;
 	}
 
-	void SetMoveCoordinate(const BoardCoordinates& board_coordinates) {
-		node_value_.first.second = board_coordinates;
+	void SetMovesFromInitialNodeVector(const std::vector<BoardCoordinates>& moves_vector) {
+		moves_from_initial_node_ = moves_vector;
 	}
 
-	void SetNodeStrenght(const int strenght) {
-		node_value_.second = strenght;
+	void AddMoveToVector(const BoardCoordinates& move_coordinates) {
+		moves_from_initial_node_.emplace_back(move_coordinates);
 	}
+
+	void MakeChildrenNode(const BoardCoordinates& move_coordinate, const int16 board_evaluation) {
+		children_node_ptrs_.emplace_back(std::make_shared<RomanChessNode>(MakeChildrenMovesVector(move_coordinate),
+																		  board_evaluation,
+																		depth_ + int8(1)));
+	}
+
+	std::vector<BoardCoordinates>&& MakeChildrenMovesVector(const BoardCoordinates& board_coordinates) {
+		std::vector<BoardCoordinates> result = moves_from_initial_node_;
+		result.emplace_back(board_coordinates);
+		return std::move(result);
+	}
+
 
 private:
-	NodeValue node_value_;
-	int depth_;
-	std::vector<std::shared_ptr<RomanChessNode>> children_nodes_;
-
+	int8 depth_;
+	int16 board_evaluation_value_;
+	std::vector<std::unique_ptr<RomanChessNode>> children_node_ptrs_;
+	std::vector<BoardCoordinates> moves_from_initial_node_;
 };
 

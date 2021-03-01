@@ -9,13 +9,11 @@
 #include "Constants.h"
 #include "FigureIncludes.h"
 #include "RomanChessGameEngine.h"
+#include "TypeAliases.h"
 
+using BoardRow = std::array<FigureImage, Constants::boardSize>;
+using BoardImage = std::array<BoardRow, Constants::boardSize>;
 using RomanChessFigures = std::array<std::array<std::shared_ptr<Figure>, Constants::boardSize>, Constants::boardSize>;
-using FigureImage = std::pair<figureType, figureColour>;
-using BoardImage = std::array<std::array<FigureImage, Constants::boardSize>, Constants::boardSize>;
-
-
-//Add comments
 
 class BoardCanvas final :
     public wxSfmlCanvas
@@ -27,99 +25,158 @@ public:
         wxSize& Size,
         long Style = 0);
 
-    /*--------------------------------------------------------------------------------------------*/
-    /*                                INITIALIZATION                                              */
-    /*--------------------------------------------------------------------------------------------*/
-    void LoadTextures();
-    void InitializeBoardSprite();
-    void InitializeRectangleSprites();
-    void SetRectangleSpriteTexture(const int row, const int collumn);
-    void SetRectangleSpritePosition(const int row, const int collumn);
+    /*-------------------------------------------------------------------------------------------------------------*/
+    /*                                              INITIALIZATION                                                 */
+    /*-------------------------------------------------------------------------------------------------------------*/
 
-    void InitializeRomanChessFigures();
-    void SetFigure(BoardCoordinates&& position);
-    void MakeFigureSprite(BoardCoordinates&& coordinates);
+    void LoadTextures() noexcept;
+    void InitializeBoardSprite() noexcept;
+    void InitializeRectangleSprites() noexcept;
 
-	/*--------------------------------------------------------------------------------------------*/
-    /*                                RENDERING FUNCTIONS                                         */
-    /*--------------------------------------------------------------------------------------------*/
+    void SetRectangleSpriteTexturesAndPositions(const BoardCoordinates coordinates) noexcept;
+    void SetRectangleSpriteTextures(const BoardCoordinates coordinates) noexcept;
+    void SetRectangleSpritePositions(const BoardCoordinates coordinates) noexcept;
 
-    void DrawSprites();
-    void ClearCanvas();
+    void InitializeRomanChessFigures() noexcept;
+    void SetFigure(BoardCoordinates position) noexcept;
+    void CreateFigure(BoardCoordinates position) noexcept;
+    void CreateEmptyFigure(std::shared_ptr<Figure>& figure) noexcept;
+    void MakeFigureSprite(BoardCoordinates coordinates) noexcept;
 
-    void DrawRectangles();
-    void DrawYellowRectangles();
-    void DrawRedRectangles();
-    
-    void DrawAllFigures();
-    void DrawBoard();
-    
-	/*--------------------------------------------------------------------------------------------*/
-    /*                                HANDLING EVENTS                                             */
-    /*--------------------------------------------------------------------------------------------*/
-
-    void HandleCanvasEvent();
-    void HandleMouseButtonPressedEvent(sf::Event& mouse_event);
-    void HandleMouseButtonReleasedEvent(sf::Event& mouse_event);
-    void HandleMouseMovedEvent(sf::Event& mouse_event);
-
-    void EnableDragging();
-    void DisableDragging();
-    void EnableDrawingRectangles();
-    void DisableDrawingRectangles();
-
-    void SetEventFigureSpritePtr(sf::Event& mouse_event);
-
-    void SetEventFigurePtr(const int x_coordinate, const int y_coordinate);
-    void ResetEventFigurePtr();
-    void SetEventFigureOffset(const sf::Vector2f& mouse_vector_coordinates);
-    void ResetEventFigureOffset();
-    void SetRectangleCoordinates(const int x_coordinate, const int  y_coordinate);
-    void EmplaceRectangleCoordinate(const BoardCoordinates& coordinate);
-    void ResetRectangleCoordinates();
-    void ClearRectangleVectors();
-
-    bool IsOnCanvas(const int x_coordinate, const int y_coordinate) const;
-    bool IsOnCanvas(sf::Vector2f coordinates) const;
-
-    void MoveEventSprite(const sf::Vector2f& mouse_position);
-    const sf::Vector2f GetEventSpritePosition() const;
-    const sf::Vector2f GetEventSpriteOffset() const;
-
-    void SetEventFigurePosition(sf::Event& mouse_event);
-
-    void MoveEventFigure(const int x_coordinate, const int y_coordinate);
-
-    void SetFigurePtr(const int x_coordinate, const int y_coordinate);
-	void ResetOldEventFigurePosition();
-    void SetEventFigureCoordinates(const int x_coordinate, const int y_coordinate);
-	void RefreshEventFigureSpritePosition();
-
-	sf::Vector2f GetVectorCoordinates(const int x_coordinate, const int y_coordinate) const;
-	std::pair<int, int> GetMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
-	std::pair<int, int> GetOffsettedMouseIntegerCoordinates(const std::pair<int, int>& mouse_coordinates) const;
-
-    void DisplayGameOverMessageBox();
-
-	/*--------------------------------------------------------------------------------------------*/
-    /*                                HELPER BOOLEAN FUNCTIONS                                    */
-    /*--------------------------------------------------------------------------------------------*/
-
-	bool IsFigureOnTile(const BoardCoordinates& coordinates) const;
-    bool IsFigureOnTile(const std::shared_ptr<Figure>& figure) const;
-	bool IsEventFigure(const int x_coordinate, const int y_coordinate) const;
-	bool IsEventMoveLegal(const int x_coordinate, const int y_coordinate) const;
-	bool IsEventMovable(const int x_coordinate, const int y_coordinate) const;
-	bool IsEventFigureRightColour() const;
-
-
+    /*-------------------------------------------------------------------------------------------------------------*/
+    /*                                         RENDERING FUNCTIONS                                                 */
+    /*-------------------------------------------------------------------------------------------------------------*/
 protected:
-    void OnUpdate() override;
+	void OnUpdate() override;
+
+public:
+    void DrawSprites() noexcept;
+    void ClearCanvas() noexcept;
+
+    void DrawRectanglesIfEnabled() noexcept;
+    void DrawRectangles() noexcept;
+    void DrawYellowRectangles() noexcept;
+    void DrawRedRectangles() noexcept;
+    
+    void DrawAllFigures() noexcept;
+    void DrawFigure(const std::shared_ptr<Figure>& figure_ptr) noexcept;
+    void DrawBoard() noexcept;
+    
+    /*-------------------------------------------------------------------------------------------------------------*/
+    /*                                           HANDLING EVENTS                                                   */
+    /*-------------------------------------------------------------------------------------------------------------*/
+
+    void HandleCanvasEvent() noexcept;
+    void HandleCanvasEventType(const sf::Event& mouse_event) noexcept;
+
+    void HandleMouseButtonPressedEvent(const sf::Event& mouse_event) noexcept;
+
+    void HandleMouseMovedIfDraggingEnabled(const sf::Event& mouse_event) noexcept;
+    void HandleMouseMovedEvent(const sf::Event& mouse_event) noexcept;
+
+    void HandleMouseButtonReleasedEvent(const sf::Event& mouse_event) noexcept;
+    
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+    /*                                        EVENT FIGURE FUNCTIONS                                               */
+    /*-------------------------------------------------------------------------------------------------------------*/
+
+    void SetEventFigureIfEligible(const sf::Event& mouse_event) noexcept;
+    void SetEventFigure(const sf::Event& mouse_event) noexcept;
+
+    void SetEventFigurePtr(const BoardCoordinates coordinates) noexcept;
+    void ResetEventFigurePtr() noexcept;
+
+    void SetEventFigureSpriteOffset(const sf::Vector2f& mouse_vector_coordinates) noexcept;
+    void ResetEventFigureSpriteOffset() noexcept;
+
+    void MoveEventFigureSpriteIfEligible(const sf::Vector2f& mouse_position) noexcept;
+    void MoveEventFigureSprite(const sf::Vector2f& mouse_position) noexcept;
+
+    void SetEventFigurePositionIfEligible(const sf::Event& mouse_event) noexcept;
+    void SetEventFigurePosition(const sf::Event& mouse_event) noexcept;
+
+    void ManageMovingEventFigureIfEligible(const BoardCoordinates coordinates) noexcept;
+    void ManageMovingEventFigure(const BoardCoordinates coordinates) noexcept;
+    void MoveEventFigure(const BoardCoordinates coordinates) noexcept;
+
+	void ResetOldEventFigurePosition() noexcept;
+	void SetEventFigureCoordinates(const BoardCoordinates coordinates) noexcept;
+	void RefreshEventFigureSpritePosition() noexcept;
+
+    void SetFigurePtrToEventPtr(const BoardCoordinates coordinates) noexcept;
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*                                        RECTANGLE FUNCTIONS                                                  */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+    void SetRectangleCoordinates() noexcept;
+    void EmplaceRectangleCoordinate(const BoardCoordinates coordinate) noexcept;
+    void ResetRectangleCoordinates() noexcept;
+    void ClearRectangleVectors() noexcept;
+
+	void EnableDrawingRectangles() noexcept;
+	void DisableDrawingRectangles() noexcept;
+    
+	/*-------------------------------------------------------------------------------------------------------------*/
+    /*                                         BOOLEAN FUNCTIONS                                                   */
+    /*-------------------------------------------------------------------------------------------------------------*/
+
+    [[nodiscard]] bool GameIsNotOver() const noexcept;
+
+	[[nodiscard]] bool IsFigureOnTile(const BoardCoordinates coordinates) const noexcept;
+    [[nodiscard]] bool IsFigureOnTile(const std::shared_ptr<Figure>& figure) const noexcept;
+    [[nodiscard]] bool IsEventFigureEqualToSelectedFigure(const BoardCoordinates coordinates) const noexcept;
+    [[nodiscard]] bool IsEventFigureMoveLegal(const BoardCoordinates coordinates) const noexcept;
+    [[nodiscard]] bool IsEventFigureMovable(const BoardCoordinates board_coordinates) const noexcept;
+    [[nodiscard]] bool IsEventFigureRightColour() const noexcept;
+    [[nodiscard]] bool IsEventFigureColourEqualToCurrentPlayerColour() const noexcept;
+
+    [[nodiscard]] bool IsOnCanvas(const BoardCoordinates coordinates) const noexcept;
+    [[nodiscard]] bool IsOnCanvas(sf::Vector2f coordinates) const noexcept;
+
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+    /*                                              GETTERS                                                        */
+    /*-------------------------------------------------------------------------------------------------------------*/
+
+    [[nodiscard]] BoardCoordinates GetBoardCoordinatesFromSfVector(const sf::Vector2f coordinates) const noexcept;
+    [[nodiscard]] sf::Vector2f GetSfVectorFromBoardCoordinates(const BoardCoordinates coordinates) const noexcept;
+
+    [[nodiscard]] sf::Vector2f GetMouseButtonVectorCoordinates(const sf::Event& mouse_event) const noexcept;
+    [[nodiscard]] sf::Vector2f GetMouseMoveVectorCoordinates(const sf::Event& mouse_event) const noexcept;
+
+    [[nodiscard]] BoardCoordinates GetMouseButtonBoardCoordinates(const sf::Event& mouse_event) const noexcept;
+    [[nodiscard]] BoardCoordinates GetMouseMoveBoardCoordinates(const sf::Event& mouse_event) const noexcept;
+
+    [[nodiscard]] const sf::Vector2f GetEventSpritePosition() const noexcept;
+    [[nodiscard]] const sf::Vector2f GetEventSpriteOffset() const noexcept;
+
+	/*-------------------------------------------------------------------------------------------------------------*/
+	/*                                            MISCELLANEOUS                                                    */
+	/*-------------------------------------------------------------------------------------------------------------*/
+
+	void EnableDragging() noexcept;
+	void DisableDragging() noexcept;
+
+    void ManageEndOfMove() noexcept;
+    void SetMoveMadeBoolean() noexcept;
+    void ResetMoveMadeBoolean() noexcept;
+
+    void ResetTemporaryValues() noexcept;
+
+    void ManageEndOfGameIfGameIsOver() noexcept;
+    void DisplayGameOverMessageBox() noexcept;
+
+    /*-------------------------------------------------------------------------------------------------------------*/
+    /*                                            CLASS MEMBERS                                                    */
+    /*-------------------------------------------------------------------------------------------------------------*/
 
 private:
     RomanChessGameEngine chess_engine_;
+    RomanChessFigures figures_;
 
-    //Pointer to figure modified by events
+    //Pointer to figure modified by event handler functions
     std::shared_ptr<Figure> event_figure_ptr_;
     
     // Distance from top left corner of sprite to mouse position
@@ -129,6 +186,7 @@ private:
 
     bool is_dragging_enabled_ = false;
     bool is_drawing_rectangles_enabled_ = false;
+    bool is_move_made_ = false;
 
     std::vector<BoardCoordinates> yellow_rectangle_positions_;
     std::vector<BoardCoordinates> red_rectangle_positions_;
@@ -141,8 +199,6 @@ private:
     sf::Sprite board_sprite_;
     std::array<std::array<sf::Sprite, Constants::boardSize>, Constants::boardSize> yellow_rectangles_;
     std::array<std::array<sf::Sprite, Constants::boardSize>, Constants::boardSize> red_rectangles_;
-
-    RomanChessFigures figures_;
 };
 
 
